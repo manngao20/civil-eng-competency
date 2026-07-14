@@ -98,6 +98,10 @@
   .btn:hover{background:var(--blue-deep); border-color:var(--blue-deep);}
   .btn.ghost{background:transparent; color:var(--ink);}
   .btn.ghost:hover{background:var(--ink); color:var(--paper);}
+  .btn.danger{border-color:var(--brick); background:var(--brick);}
+  .btn.danger:hover{background:#832e23; border-color:#832e23;}
+  .btn.danger.ghost{background:transparent; color:var(--brick);}
+  .btn.danger.ghost:hover{background:var(--brick); color:var(--paper);}
 
   /* Title block - engineering drawing style */
   .titleblock{
@@ -195,7 +199,7 @@
     font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; border-radius:2px;
   }
   select.filt{padding:10px 10px; border:1.3px solid var(--ink); background:var(--card); font-size:12.5px; font-family:'IBM Plex Mono',monospace; border-radius:2px;}
-  .counts{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); margin-bottom:14px;}
+  .counts{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
 
   table.papers{width:100%; border-collapse:collapse; font-size:13.5px;}
   table.papers thead th{
@@ -219,6 +223,11 @@
   .tagpill{font-family:'IBM Plex Mono',monospace; font-size:9.5px; background:var(--paper); border:1px solid var(--paper-line); padding:2px 6px; border-radius:2px; color:var(--ink-soft);}
   a.srclink{font-family:'IBM Plex Mono',monospace; font-size:11px;}
   .cbubble{display:inline-flex; align-items:center; gap:4px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft);}
+  .rowdel{
+    font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink-soft);
+    background:none; border:1.3px solid transparent; border-radius:2px; cursor:pointer; padding:4px 8px; line-height:1;
+  }
+  .rowdel:hover{color:var(--brick); border-color:var(--brick); background:var(--brick-pale);}
 
   /* modal */
   .overlay{position:fixed; inset:0; background:rgba(24,40,51,.55); display:none; align-items:flex-start; justify-content:center; z-index:100; padding:40px 20px; overflow:auto;}
@@ -243,7 +252,7 @@
   .sbtn.active-read{background:var(--blue-pale); border-color:var(--blue-deep);}
   .sbtn.active-pass{background:var(--moss-pale); border-color:var(--moss);}
   .sbtn.active-reject{background:var(--brick-pale); border-color:var(--brick);}
-  .modal .mfoot{padding:16px 22px; border-top:1px solid var(--paper-line); display:flex; justify-content:space-between; gap:10px;}
+  .modal .mfoot{padding:16px 22px; border-top:1px solid var(--paper-line); display:flex; justify-content:space-between; gap:10px; align-items:center;}
   .savedmsg{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--moss); opacity:0; transition:.3s;}
   .savedmsg.show{opacity:1;}
 
@@ -285,6 +294,12 @@
   .notifempty{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
   .notifbadge{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:9.5px; padding:2px 7px; border-radius:2px; background:var(--blue-pale); color:var(--blue-deep); margin-left:6px;}
   .notifbadge.off{background:#E7E3D8; color:var(--ink-soft);}
+
+  /* delete confirm overlay */
+  .confirm-modal{background:var(--paper); border:1.5px solid var(--brick); max-width:420px; width:100%; margin-bottom:40px;}
+  .confirm-modal .mhead{background:var(--brick); color:var(--paper);}
+  .confirm-modal .mbody{padding:22px; font-size:14px; line-height:1.6;}
+  .confirm-modal .mbody b{display:block; margin-top:8px; font-size:14.5px;}
 
   footer{border-top:1.5px solid var(--ink); margin-top:60px; padding:26px 24px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
 
@@ -473,12 +488,13 @@
     <div class="counts" id="counts"></div>
     <table class="papers">
       <thead><tr>
-        <th style="width:36%">งานวิจัย</th>
+        <th style="width:34%">งานวิจัย</th>
         <th>ประเทศ / ปี</th>
         <th>กลุ่ม</th>
         <th>Competency</th>
         <th>สถานะ</th>
         <th>สนทนา</th>
+        <th></th>
       </tr></thead>
       <tbody id="papersBody"></tbody>
     </table>
@@ -532,8 +548,9 @@
     </div>
     <div class="mbody" id="mBody"></div>
     <div class="mfoot">
-      <span class="savedmsg" id="savedMsg">บันทึกแล้ว ✓</span>
-      <div style="display:flex; gap:8px;">
+      <button class="btn danger ghost" style="padding:9px 14px;" onclick="requestDeleteFromModal()">🗑 ลบงานวิจัยนี้</button>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="savedmsg" id="savedMsg">บันทึกแล้ว ✓</span>
         <button class="btn ghost" onclick="closeModal()">ปิด</button>
         <button class="btn" onclick="saveModal()">บันทึก</button>
       </div>
@@ -552,6 +569,27 @@
     <div class="mfoot">
       <span></span>
       <button class="btn ghost" onclick="closeDupCheck()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Delete confirm overlay ===== -->
+<div class="overlay" id="deleteOverlay">
+  <div class="confirm-modal">
+    <div class="mhead">
+      <h3>ยืนยันการลบ</h3>
+      <button class="mclose" onclick="closeDeleteConfirm()">✕</button>
+    </div>
+    <div class="mbody">
+      คุณต้องการลบงานวิจัยนี้ออกจากฐานข้อมูลใช่หรือไม่? การลบไม่สามารถย้อนกลับได้
+      <b id="deleteTargetTitle"></b>
+    </div>
+    <div class="mfoot">
+      <span></span>
+      <div style="display:flex; gap:8px;">
+        <button class="btn ghost" onclick="closeDeleteConfirm()">ยกเลิก</button>
+        <button class="btn danger" onclick="confirmDelete()">ลบเลย</button>
+      </div>
     </div>
   </div>
 </div>
@@ -650,6 +688,7 @@ let siteConfig = {
 };
 let role = "student";
 let currentModalPaperId = null;
+let deleteTargetId = null;
 
 /* ================= STORAGE ================= */
 async function loadAll(){
@@ -869,6 +908,34 @@ function checkDupLive(){
   }
 }
 
+/* ================= DELETE ================= */
+function requestDelete(id, ev){
+  if(ev) ev.stopPropagation();
+  const p = papers.find(x=>x.id===id);
+  if(!p) return;
+  deleteTargetId = id;
+  document.getElementById('deleteTargetTitle').textContent = p.title;
+  document.getElementById('deleteOverlay').classList.add('show');
+}
+function requestDeleteFromModal(){
+  if(!currentModalPaperId) return;
+  requestDelete(currentModalPaperId);
+}
+function closeDeleteConfirm(){
+  deleteTargetId = null;
+  document.getElementById('deleteOverlay').classList.remove('show');
+}
+async function confirmDelete(){
+  if(!deleteTargetId) return;
+  const p = papers.find(x=>x.id===deleteTargetId);
+  papers = papers.filter(x=>x.id!==deleteTargetId);
+  await savePapers();
+  closeDeleteConfirm();
+  if(currentModalPaperId===deleteTargetId){ closeModal(); }
+  renderPapers(); renderStats(); renderMindmap(); renderAnalytics();
+  if(p) sendNotification(`มีการลบงานวิจัยออกจากฐานข้อมูล`, `"${p.title}" ถูกลบโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
+}
+
 /* ================= STATS (home) ================= */
 function renderStats(){
   const total = papers.length;
@@ -973,7 +1040,7 @@ function getFilteredPapers(){
 }
 function renderPapers(){
   const filtered = getFilteredPapers();
-  document.getElementById('counts').textContent = `แสดง ${filtered.length} จาก ${papers.length} รายการ`;
+  document.getElementById('counts').innerHTML = `<span>แสดง ${filtered.length} จาก ${papers.length} รายการ</span>`;
   document.getElementById('papersBody').innerHTML = filtered.map(p=>`
     <tr onclick="openModal('${p.id}')">
       <td>
@@ -985,6 +1052,7 @@ function renderPapers(){
       <td><div class="taglist">${p.tags.map(t=>`<span class="tagpill">${t}</span>`).join('')}</div></td>
       <td><span class="badge ${p.status}">${statusLabel(p.status)}</span></td>
       <td><span class="cbubble">💬 ${(p.comments||[]).length}</span></td>
+      <td><button class="rowdel" title="ลบงานวิจัยนี้" onclick="requestDelete('${p.id}', event)">🗑</button></td>
     </tr>
   `).join('');
 }
