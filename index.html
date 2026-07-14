@@ -179,14 +179,17 @@
   select.filt{padding:10px 10px; border:1.3px solid var(--ink); background:var(--card); font-size:12.5px; font-family:'IBM Plex Mono',monospace; border-radius:2px;}
   .counts{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
 
-  table.papers{width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.papers{width:100%; border-collapse:separate; border-spacing:0 10px; font-size:13.5px;}
   table.papers thead th{
     text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;
     color:var(--ink-soft); border-bottom:1.5px solid var(--ink); padding:8px 10px;
   }
-  table.papers tbody tr{border-bottom:1px solid var(--paper-line); cursor:pointer; transition:.1s;}
+  table.papers tbody tr{cursor:pointer; transition:.1s; background:var(--card);}
   table.papers tbody tr:hover{background:var(--blue-pale);}
-  table.papers td{padding:12px 10px; vertical-align:top;}
+  table.papers tbody tr:hover td{border-color:var(--blue-deep);}
+  table.papers td{padding:14px 12px; vertical-align:top; border-top:1.3px solid var(--ink); border-bottom:1.3px solid var(--ink);}
+  table.papers td:first-child{border-left:1.3px solid var(--ink); border-top-left-radius:2px; border-bottom-left-radius:2px;}
+  table.papers td:last-child{border-right:1.3px solid var(--ink); border-top-right-radius:2px; border-bottom-right-radius:2px;}
   .ptitle{font-weight:600; margin-bottom:3px;}
   .pmeta{font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
   .badge{
@@ -290,7 +293,9 @@
     .topbar-inner{flex-wrap:wrap;}
     table.papers thead{display:none;}
     table.papers, table.papers tbody, table.papers tr, table.papers td{display:block; width:100%;}
-    table.papers tr{padding:10px 0;}
+    table.papers{border-spacing:0 0;}
+    table.papers tr{padding:10px 12px; border:1.3px solid var(--ink); border-radius:2px; margin-bottom:10px; background:var(--card);}
+    table.papers td{padding:6px 0; border:none;}
     .analytics-grid{grid-template-columns:1fr;}
     .barrow .blbl{width:100px; font-size:10px;}
     .caddrow{flex-direction:column;}
