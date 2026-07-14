@@ -225,6 +225,14 @@
   }
   .mfield textarea{min-height:70px; resize:vertical; font-family:'IBM Plex Sans';}
   .statusrow{display:flex; gap:8px; flex-wrap:wrap;}
+  .tagcheck-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px;}
+  .tagcheck-item{
+    display:flex; align-items:center; gap:8px; font-size:13px; padding:8px 10px;
+    border:1.3px solid var(--paper-line); background:var(--card); border-radius:2px; cursor:pointer; transition:.12s;
+  }
+  .tagcheck-item:has(input:checked){border-color:var(--ink); background:var(--blue-pale);}
+  .tagcheck-item input{cursor:pointer; width:auto !important; padding:0 !important; border:none !important; accent-color:var(--blue-deep);}
+  .tagcheck-item input:disabled{cursor:default;}
   .sbtn{
     font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; padding:9px 14px; border-radius:2px;
     border:1.3px solid var(--ink); background:var(--card); cursor:pointer;
@@ -539,12 +547,41 @@
     <div class="mbody">
       คุณต้องการลบงานวิจัยนี้ออกจากฐานข้อมูลใช่หรือไม่? การลบไม่สามารถย้อนกลับได้
       <b id="deleteTargetTitle"></b>
+      <div class="mfield" style="margin-top:14px;">
+        <label>ใส่รหัสผ่านเพื่อยืนยันการลบ</label>
+        <input type="password" id="deletePassInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter'){confirmDelete();}">
+        <div class="dupwarn" id="deletePassError" style="display:none;">รหัสผ่านไม่ถูกต้อง</div>
+      </div>
     </div>
     <div class="mfoot">
       <span></span>
       <div style="display:flex; gap:8px;">
         <button class="btn ghost" onclick="closeDeleteConfirm()">ยกเลิก</button>
         <button class="btn danger" onclick="confirmDelete()">ลบเลย</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Password gate overlay (reused for protected actions) ===== -->
+<div class="overlay" id="passGateOverlay">
+  <div class="confirm-modal">
+    <div class="mhead">
+      <h3 id="passGateTitle">ยืนยันรหัสผ่าน</h3>
+      <button class="mclose" onclick="closePassGate()">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="mfield">
+        <label>ใส่รหัสผ่านเพื่อดำเนินการต่อ</label>
+        <input type="password" id="passGateInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter'){confirmPassGate();}">
+        <div class="dupwarn" id="passGateError" style="display:none;">รหัสผ่านไม่ถูกต้อง</div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <span></span>
+      <div style="display:flex; gap:8px;">
+        <button class="btn ghost" onclick="closePassGate()">ยกเลิก</button>
+        <button class="btn" onclick="confirmPassGate()">ยืนยัน</button>
       </div>
     </div>
   </div>
@@ -707,14 +744,18 @@ function applySummaryLink(){
 function handleSummaryClick(e){
   if(!siteConfig.summaryUrl){
     e.preventDefault();
-    openSummaryPop();
+    requestPassGate('ใส่รหัสผ่านเพื่อตั้งลิงก์ภาพรวมงานวิจัย', ()=>openSummaryPop());
     return false;
   }
   return true;
 }
 function toggleSummaryPop(){
   const pop = document.getElementById('summaryPop');
-  if(pop.classList.contains('show')) closeSummaryPop(); else openSummaryPop();
+  if(pop.classList.contains('show')){
+    closeSummaryPop();
+  }else{
+    requestPassGate('ใส่รหัสผ่านเพื่อแก้ไขลิงก์', ()=>openSummaryPop());
+  }
 }
 function openSummaryPop(){
   document.getElementById('summaryPop').classList.add('show');
@@ -739,6 +780,13 @@ document.addEventListener('click', (e)=>{
 
 let tbEditing = false;
 function toggleTitleblockEdit(){
+  if(!tbEditing){
+    requestPassGate('ใส่รหัสผ่านเพื่อแก้ไข Title Block', ()=>doToggleTitleblockEdit());
+    return;
+  }
+  doToggleTitleblockEdit();
+}
+function doToggleTitleblockEdit(){
   tbEditing = !tbEditing;
   document.querySelectorAll('.titleblock input.editable').forEach(inp=>{ inp.readOnly = !tbEditing; });
   document.getElementById('titleblock').classList.toggle('editing', tbEditing);
@@ -860,14 +908,45 @@ function checkDupLive(){
   }
 }
 
+/* ================= PASSWORD GATE (reused for editing link / title block) ================= */
+const EDIT_PASSCODE = "1234";
+let passGateCallback = null;
+function requestPassGate(title, callback){
+  passGateCallback = callback;
+  document.getElementById('passGateTitle').textContent = title || 'ยืนยันรหัสผ่าน';
+  const inp = document.getElementById('passGateInput'); inp.value = '';
+  document.getElementById('passGateError').style.display = 'none';
+  document.getElementById('passGateOverlay').classList.add('show');
+  setTimeout(()=>inp.focus(), 50);
+}
+function closePassGate(){
+  passGateCallback = null;
+  document.getElementById('passGateOverlay').classList.remove('show');
+}
+function confirmPassGate(){
+  const val = (document.getElementById('passGateInput').value || '').trim();
+  if(val !== EDIT_PASSCODE){
+    document.getElementById('passGateError').style.display = 'block';
+    document.getElementById('passGateInput').focus();
+    return;
+  }
+  const cb = passGateCallback;
+  closePassGate();
+  if(cb) cb();
+}
+
 /* ================= DELETE ================= */
+const DELETE_PASSCODE = "1234";
 function requestDelete(id, ev){
   if(ev) ev.stopPropagation();
   const p = papers.find(x=>x.id===id);
   if(!p) return;
   deleteTargetId = id;
   document.getElementById('deleteTargetTitle').textContent = p.title;
+  const pass = document.getElementById('deletePassInput'); pass.value=''; 
+  document.getElementById('deletePassError').style.display='none';
   document.getElementById('deleteOverlay').classList.add('show');
+  setTimeout(()=>pass.focus(), 50);
 }
 function requestDeleteFromModal(){
   if(!currentModalPaperId) return;
@@ -879,6 +958,12 @@ function closeDeleteConfirm(){
 }
 async function confirmDelete(){
   if(!deleteTargetId) return;
+  const passVal = (document.getElementById('deletePassInput').value || '').trim();
+  if(passVal !== DELETE_PASSCODE){
+    document.getElementById('deletePassError').style.display='block';
+    document.getElementById('deletePassInput').focus();
+    return;
+  }
   const p = papers.find(x=>x.id===deleteTargetId);
   papers = papers.filter(x=>x.id!==deleteTargetId);
   await savePapers();
@@ -1012,6 +1097,11 @@ function openModal(id){
         <option value="both" ${p.level==='both'?'selected':''}>ทั้งสองกลุ่ม</option>
       </select>
     </div>
+    <div class="mfield"><label>Competency (เลือกได้มากกว่า 1)</label>
+      <div class="tagcheck-grid" id="tagCheckGrid">
+        ${ALL_TAGS.map(t=>`<label class="tagcheck-item"><input type="checkbox" value="${t}" ${p.tags.includes(t)?'checked':''} ${role==='advisor'?'disabled':''}><span>${t}</span></label>`).join('')}
+      </div>
+    </div>
     <div class="mfield"><label>บันทึกของนักศึกษา (แก้ไขได้)</label>
       <textarea id="f-notes" ${role==='advisor'?'disabled':''}>${p.notes}</textarea>
     </div>
@@ -1060,6 +1150,13 @@ async function saveModal(){
   const country = document.getElementById('f-country'); if(country && !country.disabled) p.country = country.value;
   const method = document.getElementById('f-method'); if(method && !method.disabled) p.method = method.value;
   const level = document.getElementById('f-level'); if(level && !level.disabled) p.level = level.value;
+  const tagGrid = document.getElementById('tagCheckGrid');
+  if(tagGrid){
+    const boxes = tagGrid.querySelectorAll('input[type=checkbox]');
+    if(boxes.length && !boxes[0].disabled){
+      p.tags = Array.from(boxes).filter(b=>b.checked).map(b=>b.value);
+    }
+  }
   const notes = document.getElementById('f-notes'); if(notes && !notes.disabled) p.notes = notes.value;
   const feedbackEl = document.getElementById('f-feedback');
   const feedbackChanged = feedbackEl && !feedbackEl.disabled && feedbackEl.value !== p.feedback;
