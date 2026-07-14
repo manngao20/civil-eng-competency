@@ -272,6 +272,20 @@
   .barrow .bfill{height:100%;}
   .barrow .bval{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; width:26px; text-align:left; flex-shrink:0;}
 
+  /* duplicate check + notif log */
+  .dupwarn{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brick); margin-top:6px; line-height:1.6;}
+  .dupwarn a{color:var(--brick); text-decoration:underline;}
+  .duprow{border:1.3px solid var(--brick); background:var(--brick-pale); padding:12px 14px; margin-bottom:10px; border-radius:2px;}
+  .duprow .dh{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--brick); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+  .duprow .dtitle{font-size:13px; margin-bottom:3px;}
+  .duprow .dtitle b{cursor:pointer; text-decoration:underline;}
+  .dupempty{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--moss);}
+  .notifitem{border-bottom:1px solid var(--paper-line); padding:9px 0; font-size:12.5px;}
+  .notifitem .nh{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); display:flex; justify-content:space-between; margin-bottom:3px;}
+  .notifempty{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+  .notifbadge{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:9.5px; padding:2px 7px; border-radius:2px; background:var(--blue-pale); color:var(--blue-deep); margin-left:6px;}
+  .notifbadge.off{background:#E7E3D8; color:var(--ink-soft);}
+
   footer{border-top:1.5px solid var(--ink); margin-top:60px; padding:26px 24px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
 
   @media(max-width:820px){
@@ -342,27 +356,28 @@
       <div class="titleblock" id="titleblock">
         <div class="tb-head"><span>Title Block</span><span id="tb-edit-toggle" onclick="toggleTitleblockEdit()" style="cursor:pointer;text-decoration:underline;">แก้ไข</span></div>
         <div class="tb-row">
-          <div class="tb-cell"><span class="lbl">University</span><input class="val editable" data-key="univ" value="King Mongkut's University of Technology North Bangkok" readonly></div>
-          <div class="tb-cell"><span class="lbl">Department</span><input class="val editable" data-key="dept" value="Department of Civil and Environmental Engineering Technology (CvET)" readonly></div>
+          <div class="tb-cell tb-full"><span class="lbl">University</span><input class="val editable" data-key="univ" value="King Mongkut's University of Technology North Bangkok" readonly></div>
+        </div>
+        <div class="tb-row">
+          <div class="tb-cell tb-full"><span class="lbl">Department</span><input class="val editable" data-key="dept" value="Department of Civil and Environmental Engineering Technology (CvET)" readonly></div>
         </div>
         <div class="tb-row">
           <div class="tb-cell tb-full"><span class="lbl">Project Title</span><input class="val editable" data-key="title" value="Competencies of Civil Engineers: A Systematic Literature Review" readonly></div>
         </div>
-       <div class="tb-row">
-          <div class="tb-cell"><span class="lbl">Advisor</span><input class="val editable" data-key="advisor" value="Prof. — —" readonly></div>
+        <div class="tb-row">
+          <div class="tb-cell tb-full"><span class="lbl">Advisor</span><input class="val editable" data-key="advisor" value="Prof. — —" readonly></div>
+        </div>
+        <div class="tb-row">
           <div class="tb-cell"><span class="lbl">Student 1 — Name</span><input class="val editable" data-key="student1name" value="— —" readonly></div>
-        </div>
-        <div class="tb-row">
           <div class="tb-cell"><span class="lbl">Student 1 — ID</span><input class="val editable" data-key="student1id" value="— —" readonly></div>
+        </div>
+        <div class="tb-row">
           <div class="tb-cell"><span class="lbl">Student 2 — Name</span><input class="val editable" data-key="student2name" value="— —" readonly></div>
-        </div>
-        <div class="tb-row">
           <div class="tb-cell"><span class="lbl">Student 2 — ID</span><input class="val editable" data-key="student2id" value="— —" readonly></div>
-          <div class="tb-cell"></div>
         </div>
         <div class="tb-row">
-          <div class="tb-cell"><span class="lbl">Student 2 - Name</span><input class="val editable" data-key="year" value="2026" readonly></div>
-          <div class="tb-cell"><span class="lbl">Student 2 — ID</span><input class="val editable" data-key="rev" value="00" readonly></div>
+          <div class="tb-cell"><span class="lbl">Year</span><input class="val editable" data-key="year" value="2026" readonly></div>
+          <div class="tb-cell"><span class="lbl">Rev</span><input class="val editable" data-key="rev" value="00" readonly></div>
         </div>
       </div>
     </div>
@@ -453,6 +468,7 @@
       </select>
       <button class="btn ghost" style="padding:9px 14px;" onclick="exportCSV()">⬇ Export CSV</button>
       <button class="btn ghost" style="padding:9px 14px;" onclick="openAddModal()">+ เพิ่มงานวิจัย</button>
+      <button class="btn ghost" style="padding:9px 14px;" onclick="openDupCheck()">🔍 ตรวจสอบงานซ้ำ</button>
     </div>
     <div class="counts" id="counts"></div>
     <table class="papers">
@@ -495,6 +511,11 @@
         <h3>ตามประเทศ/ภูมิภาค</h3>
         <div id="chartCountries"></div>
       </div>
+      <div class="chartblock full">
+        <h3>ประวัติการแจ้งเตือน (Notification Log) <span class="notifbadge off" id="notifStatusBadge">EMAIL: OFF</span></h3>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:10px;">แจ้งเตือนไปยัง <b>s6603061612096@email.kmutnb.ac.th</b> เมื่อมีคอมเมนต์จากอาจารย์ / มีการตรวจงานวิจัย / มีการเพิ่มงานวิจัยใหม่</div>
+        <div id="notifLog"></div>
+      </div>
     </div>
   </section>
 
@@ -520,10 +541,56 @@
   </div>
 </div>
 
+<!-- ===== Duplicate check overlay ===== -->
+<div class="overlay" id="dupOverlay">
+  <div class="modal">
+    <div class="mhead">
+      <h3>ตรวจสอบงานวิจัยซ้ำ</h3>
+      <button class="mclose" onclick="closeDupCheck()">✕</button>
+    </div>
+    <div class="mbody" id="dupBody"></div>
+    <div class="mfoot">
+      <span></span>
+      <button class="btn ghost" onclick="closeDupCheck()">ปิด</button>
+    </div>
+  </div>
+</div>
+
 <!-- Storage shim: makes window.storage work on a plain static host (see storage-shim.js) -->
 <script src="storage-shim.js"></script>
+<!-- EmailJS (optional): enables real automatic email sending, see EMAILJS_CONFIG below -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <script>
+/* ================= EMAIL NOTIFICATION CONFIG =================
+   This site is a static front-end file — a browser page cannot send
+   real email on its own. To make the "แจ้งเตือน" below actually land
+   in the inbox automatically (no manual click), this uses EmailJS
+   (a free client-side email service). Steps:
+     1) Create a free account at https://www.emailjs.com
+     2) Add an Email Service (e.g. Gmail) -> get a Service ID
+     3) Create an Email Template with variables {{subject}} and
+        {{message}} and {{to_email}} -> get a Template ID
+     4) Get your Public Key from Account > API Keys
+     5) Paste the 3 values below and set enabled:true
+   Until you do that, notifications are still recorded in the
+   "ประวัติการแจ้งเตือน" log on the Analytics page (stored via
+   window.storage), so nothing is lost — they just won't hit the
+   inbox automatically until EmailJS is configured.
+================================================================= */
+const EMAILJS_CONFIG = {
+  enabled: false,
+  serviceId: 'YOUR_SERVICE_ID',
+  templateId: 'YOUR_TEMPLATE_ID',
+  publicKey: 'YOUR_PUBLIC_KEY',
+  notifyEmail: 's6603061612096@email.kmutnb.ac.th'
+};
+try{
+  if(EMAILJS_CONFIG.enabled && window.emailjs && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey!=='YOUR_PUBLIC_KEY'){
+    emailjs.init(EMAILJS_CONFIG.publicKey);
+  }
+}catch(e){}
+
 /* ================= DATA ================= */
 const TAG_COLORS = {
   "Technical":"#2C5C82","Project Management":"#B9812E","Leadership":"#A24A3D",
@@ -574,7 +641,10 @@ let siteConfig = {
   univ:"King Mongkut's University of Technology North Bangkok",
   dept:"Department of Civil and Environmental Engineering Technology (CvET)",
   title:"Competencies of Civil Engineers: A Systematic Literature Review",
-  advisor:"Prof. — —", students:"— —", year:"2026", rev:"00",
+  advisor:"Prof. — —",
+  student1name:"— —", student1id:"— —",
+  student2name:"— —", student2id:"— —",
+  year:"2026", rev:"00",
   summaryUrl:"",
   prisma:{identified:342, duplicates:58, excludedScreen:190, excludedFulltext:74}
 };
@@ -607,6 +677,9 @@ async function loadAll(){
   renderPapers();
   renderMindmap();
   renderAnalytics();
+  renderNotifLog();
+  document.getElementById('notifStatusBadge').textContent = (EMAILJS_CONFIG.enabled ? 'EMAIL: ON' : 'EMAIL: OFF (ตั้งค่า EmailJS เพื่อเปิด)');
+  document.getElementById('notifStatusBadge').classList.toggle('off', !EMAILJS_CONFIG.enabled);
 }
 async function savePapers(){
   try{ await window.storage.set('papers-v1', JSON.stringify(papers), true); }catch(e){}
@@ -620,7 +693,7 @@ function goPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.p===p));
-  if(p==='stats') renderAnalytics();
+  if(p==='stats'){ renderAnalytics(); renderNotifLog(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function setRole(v){ role = v; }
@@ -689,6 +762,112 @@ document.addEventListener('input', (e)=>{
     window.__cfgT = setTimeout(saveConfig, 600);
   }
 });
+
+/* ================= NOTIFICATIONS ================= */
+async function sendNotification(subject, message){
+  const entry = {subject, message, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}), sent:false};
+  if(EMAILJS_CONFIG.enabled && window.emailjs && EMAILJS_CONFIG.publicKey!=='YOUR_PUBLIC_KEY'){
+    try{
+      await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+        to_email: EMAILJS_CONFIG.notifyEmail,
+        subject: subject,
+        message: message
+      });
+      entry.sent = true;
+    }catch(e){
+      entry.sent = false;
+      entry.error = 'ส่งอีเมลไม่สำเร็จ (ตรวจสอบการตั้งค่า EmailJS)';
+      console.error('EmailJS send failed', e);
+    }
+  }
+  try{
+    const key = 'notif-log-v1';
+    let log = [];
+    try{ const r = await window.storage.get(key, true); log = JSON.parse(r.value) || []; }catch(e){}
+    log.unshift(entry);
+    log = log.slice(0, 60);
+    await window.storage.set(key, JSON.stringify(log), true);
+  }catch(e){}
+  renderNotifLog();
+}
+async function renderNotifLog(){
+  const el = document.getElementById('notifLog');
+  if(!el) return;
+  let log = [];
+  try{ const r = await window.storage.get('notif-log-v1', true); log = JSON.parse(r.value) || []; }catch(e){}
+  if(!log.length){
+    el.innerHTML = `<div class="notifempty">ยังไม่มีการแจ้งเตือน</div>`;
+    return;
+  }
+  el.innerHTML = log.map(n=>`
+    <div class="notifitem">
+      <div class="nh"><span>${n.time}${n.sent ? ' · ส่งอีเมลแล้ว ✓' : (EMAILJS_CONFIG.enabled ? ' · ส่งไม่สำเร็จ' : ' · บันทึกไว้ (ยังไม่ได้ตั้งค่าอีเมล)')}</span></div>
+      <b>${escapeHtml(n.subject)}</b><br>${escapeHtml(n.message)}
+    </div>
+  `).join('');
+}
+
+/* ================= DUPLICATE CHECK ================= */
+function normalizeTitle(t){
+  return (t||'').toLowerCase().replace(/[^\w\u0E00-\u0E7F]+/g,' ').replace(/\s+/g,' ').trim();
+}
+function titleSimilarity(a,b){
+  const wa = new Set(normalizeTitle(a).split(' ').filter(w=>w.length>2));
+  const wb = new Set(normalizeTitle(b).split(' ').filter(w=>w.length>2));
+  if(!wa.size || !wb.size) return 0;
+  let inter=0;
+  wa.forEach(w=>{ if(wb.has(w)) inter++; });
+  const union = new Set([...wa,...wb]).size;
+  return union ? inter/union : 0;
+}
+function findDuplicatePairs(threshold){
+  threshold = threshold || 0.45;
+  const dups = [];
+  for(let i=0;i<papers.length;i++){
+    for(let j=i+1;j<papers.length;j++){
+      const p1=papers[i], p2=papers[j];
+      let sim = titleSimilarity(p1.title, p2.title);
+      const u1 = (p1.url||'').trim().replace(/\/$/,'');
+      const u2 = (p2.url||'').trim().replace(/\/$/,'');
+      const sameUrl = u1 && u2 && u1!=='https:' && u1===u2;
+      if(sameUrl) sim = Math.max(sim, 1);
+      if(sim >= threshold) dups.push({p1,p2,sim,sameUrl});
+    }
+  }
+  return dups.sort((a,b)=>b.sim-a.sim);
+}
+function openDupCheck(){
+  const dups = findDuplicatePairs(0.45);
+  const body = document.getElementById('dupBody');
+  if(!dups.length){
+    body.innerHTML = `<div class="dupempty">✓ ไม่พบงานวิจัยที่ซ้ำกัน (เทียบจากชื่อเรื่องและลิงก์แหล่งที่มา) จากทั้งหมด ${papers.length} รายการ</div>`;
+  }else{
+    body.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;">พบ ${dups.length} คู่ที่อาจซ้ำกัน (เรียงตามความคล้าย มากไปน้อย)</div>` +
+      dups.map(d=>`
+        <div class="duprow">
+          <div class="dh">${d.sameUrl ? 'ลิงก์แหล่งที่มาตรงกัน' : 'ชื่อเรื่องคล้ายกัน ~'+Math.round(d.sim*100)+'%'}</div>
+          <div class="dtitle">1. <b onclick="closeDupCheck();openModal('${d.p1.id}')">${escapeHtml(d.p1.title)}</b> <span style="color:var(--ink-soft);">(${d.p1.year})</span></div>
+          <div class="dtitle">2. <b onclick="closeDupCheck();openModal('${d.p2.id}')">${escapeHtml(d.p2.title)}</b> <span style="color:var(--ink-soft);">(${d.p2.year})</span></div>
+        </div>
+      `).join('');
+  }
+  document.getElementById('dupOverlay').classList.add('show');
+}
+function closeDupCheck(){
+  document.getElementById('dupOverlay').classList.remove('show');
+}
+function checkDupLive(){
+  const val = document.getElementById('f-title') ? document.getElementById('f-title').value : '';
+  const warnEl = document.getElementById('dupLiveWarn');
+  if(!warnEl) return;
+  if(!val || val.trim().length<4){ warnEl.innerHTML=''; return; }
+  const matches = papers.filter(p=>p.id!==currentModalPaperId && titleSimilarity(p.title, val) >= 0.45);
+  if(matches.length){
+    warnEl.innerHTML = `⚠️ อาจซ้ำกับ ${matches.length} รายการ: ` + matches.map(m=>`<a href="#" onclick="event.preventDefault();closeModal();openModal('${m.id}')">${escapeHtml(m.title)}</a>`).join(', ');
+  }else{
+    warnEl.innerHTML = '';
+  }
+}
 
 /* ================= STATS (home) ================= */
 function renderStats(){
@@ -839,6 +1018,10 @@ function openModal(id){
   const p = papers.find(x=>x.id===id);
   document.getElementById('mTitle').textContent = p.title;
   document.getElementById('mBody').innerHTML = `
+    <div class="mfield"><label>ชื่อเรื่องงานวิจัย</label>
+      <input id="f-title" value="${escapeAttr(p.title)}" oninput="checkDupLive()" ${role==='advisor'?'disabled':''}>
+      <div class="dupwarn" id="dupLiveWarn"></div>
+    </div>
     <div class="mfield"><label>ผู้แต่ง / ปี / แหล่งตีพิมพ์</label>
       <div style="font-size:13px;color:var(--ink-soft);">${p.authors} — ${p.year} — ${p.venue}</div>
     </div>
@@ -882,8 +1065,10 @@ function openModal(id){
   `;
   document.getElementById('overlay').classList.add('show');
   document.getElementById('statusRow').dataset.picked = p.status;
+  document.getElementById('statusRow').dataset.original = p.status;
   renderComments(p);
 }
+function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
 function pickStatus(s){
   document.querySelectorAll('#statusRow .sbtn').forEach(b=>b.className='sbtn'+(b.dataset.s===s?' active-'+s:''));
   document.getElementById('statusRow').dataset.picked = s;
@@ -895,16 +1080,30 @@ function closeModal(){
 async function saveModal(){
   const p = papers.find(x=>x.id===currentModalPaperId);
   if(!p) return;
-  const picked = document.getElementById('statusRow').dataset.picked;
+  const statusRow = document.getElementById('statusRow');
+  const picked = statusRow.dataset.picked;
+  const originalStatus = statusRow.dataset.original;
+  const titleEl = document.getElementById('f-title'); if(titleEl && !titleEl.disabled) p.title = titleEl.value.trim() || p.title;
   if(picked) p.status = picked;
   const summary = document.getElementById('f-summary'); if(summary && !summary.disabled) p.mySummaryUrl = summary.value.trim();
   const country = document.getElementById('f-country'); if(country && !country.disabled) p.country = country.value;
   const method = document.getElementById('f-method'); if(method && !method.disabled) p.method = method.value;
   const level = document.getElementById('f-level'); if(level && !level.disabled) p.level = level.value;
   const notes = document.getElementById('f-notes'); if(notes && !notes.disabled) p.notes = notes.value;
-  const feedback = document.getElementById('f-feedback'); if(feedback && !feedback.disabled) p.feedback = feedback.value;
+  const feedbackEl = document.getElementById('f-feedback');
+  const feedbackChanged = feedbackEl && !feedbackEl.disabled && feedbackEl.value !== p.feedback;
+  if(feedbackEl && !feedbackEl.disabled) p.feedback = feedbackEl.value;
   await savePapers();
   renderPapers(); renderStats(); renderMindmap(); renderAnalytics();
+
+  // notify: advisor reviewed (status changed) or advisor left feedback
+  if(picked && picked !== originalStatus){
+    sendNotification(`มีการตรวจงานวิจัย: ${p.title}`, `สถานะเปลี่ยนเป็น "${statusLabel(picked)}" โดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
+  }
+  if(role==='advisor' && feedbackChanged && p.feedback.trim()){
+    sendNotification(`Feedback ใหม่จากอาจารย์: ${p.title}`, p.feedback);
+  }
+
   const m = document.getElementById('savedMsg'); m.classList.add('show');
   setTimeout(()=>m.classList.remove('show'), 1400);
 }
@@ -912,7 +1111,10 @@ function openAddModal(){
   const id = 'p'+(Date.now());
   const blank = {id, title:"งานวิจัยใหม่ (แก้ไขชื่อเรื่อง)", authors:"", year:new Date().getFullYear(), venue:"", country:"", url:"https://", level:"entry", tags:[], method:"", status:"unread", feedback:"", notes:"", comments:[], mySummaryUrl:""};
   papers.push(blank);
-  savePapers().then(()=>{ renderPapers(); renderStats(); renderAnalytics(); openModal(id); });
+  savePapers().then(()=>{
+    renderPapers(); renderStats(); renderAnalytics(); openModal(id);
+    sendNotification('มีการเพิ่มงานวิจัยใหม่', `เพิ่มรายการใหม่ในฐานข้อมูลโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'} — กรุณาตรวจสอบและกรอกรายละเอียดให้ครบ`);
+  });
 }
 
 /* ================= COMMENTS ================= */
@@ -947,6 +1149,9 @@ async function addComment(){
   await savePapers();
   renderComments(p);
   renderPapers();
+  if(role==='advisor'){
+    sendNotification(`คอมเมนต์ใหม่จากอาจารย์: ${p.title}`, text);
+  }
 }
 
 /* ================= ANALYTICS ================= */
