@@ -303,6 +303,25 @@
 .paper-item:hover{
     background:var(--paper);
 }
+.analytics-toolbar .ctbtn{background:transparent; display:inline-flex; align-items:center; gap:6px;}
+.analytics-toolbar .ctbtn.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.piewrap{display:flex; gap:26px; align-items:center; flex-wrap:wrap;}
+.pie-slice{cursor:pointer; transition:opacity .15s, transform .15s; transform-origin:90px 90px;}
+.pie-slice:hover{opacity:.82;}
+.chart-legend{display:flex; flex-direction:column; gap:4px; flex:1; min-width:160px;}
+.legend-item{
+  display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
+  cursor:pointer; padding:5px 8px; border:1px solid transparent; border-radius:2px; transition:.12s;
+}
+.legend-item:hover{background:var(--paper); border-color:var(--paper-line); color:var(--ink);}
+.legend-swatch{width:11px; height:11px; border-radius:2px; flex-shrink:0;}
+.legend-item .lv{margin-left:auto; font-weight:600;}
+.chartblock.empty-note{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+.drilldown-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px;}
+.drilldown-close{cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-decoration:underline; white-space:nowrap;}
+.paper-item .pi-title{font-weight:600; font-size:13.5px; margin-bottom:5px; line-height:1.4;}
+.paper-item .pi-meta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-bottom:6px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;}
+.paper-item .pi-summary{font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
   /* duplicate check + notif log */
   .dupwarn{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brick); margin-top:6px; line-height:1.6;}
   .dupwarn a{color:var(--brick); text-decoration:underline;}
@@ -512,6 +531,13 @@
       <h2>Research Analytics</h2>
       <div class="note">สรุปภาพรวมฐานข้อมูลงานวิจัยแบบเรียลไทม์</div>
     </div>
+    <div class="analytics-toolbar">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em;">รูปแบบกราฟ:</span>
+      <button type="button" class="btn ghost ctbtn active" data-t="bar" onclick="setChartType('bar')">▭ แท่ง (Bar)</button>
+      <button type="button" class="btn ghost ctbtn" data-t="pie" onclick="setChartType('pie')">◐ วงกลม (Pie)</button>
+      <button type="button" class="btn ghost ctbtn" data-t="donut" onclick="setChartType('donut')">◎ โดนัท (Donut)</button>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-left:auto;">💡 คลิกที่แท่ง/ชิ้นกราฟ เพื่อดูรายชื่องานวิจัยในกลุ่มนั้น</span>
+    </div>
     <div class="analytics-grid">
       <div class="chartblock">
         <h3>สถานะการตรวจ</h3>
@@ -534,6 +560,15 @@
         <div id="chartCountries"></div>
       </div>
     </div>
+
+    <div class="chartblock full" id="drilldownBlock" style="display:none; margin-top:20px;">
+      <div class="drilldown-header">
+        <h3 id="drilldownTitle" style="margin:0;">รายละเอียดงานวิจัย</h3>
+        <span class="drilldown-close" onclick="closeDrilldown()">ปิด ✕</span>
+      </div>
+      <div id="paperList"></div>
+    </div>
+
     <div style="text-align:right; margin-top:18px;">
       <span onclick="requestPassGate('ใส่รหัสผ่านเพื่อดูประวัติการทำรายการ', ()=>openActivityLog())" style="cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); text-decoration:underline; opacity:.6;" title="ประวัติการทำรายการ">⋯ ประวัติการทำรายการ</span>
     </div>
@@ -1430,44 +1465,167 @@ async function addComment(){
 }
 
 /* ================= ANALYTICS ================= */
+let chartType = 'bar'; // 'bar' | 'pie' | 'donut'
+const CHART_PALETTE = ['#2C5C82','#B9812E','#A24A3D','#4E7350','#6B5B95','#8A6D3B','#3E6E6E','#5A7D3A','#7A5C4A','#456B8C','#C2703C','#3E7D6E'];
+
 function countBy(arr, key){
   const o = {};
   arr.forEach(x=>{ o[x[key]] = (o[x[key]]||0)+1; });
   return o;
 }
-function renderBarChart(elId, dataObj, labelMap, colorMap, fallbackColor, sortByKey){
+function setChartType(t){
+  chartType = t;
+  document.querySelectorAll('.analytics-toolbar .ctbtn').forEach(b=>b.classList.toggle('active', b.dataset.t===t));
+  renderAnalytics(true);
+}
+
+/* Unified chart renderer: config = {labelMap, colorMap, fallbackColor, sortByKey, matchField} */
+function renderChart(elId, dataObj, config){
+  config = config || {};
   let entries = Object.entries(dataObj);
-  entries = sortByKey ? entries.sort((a,b)=> a[0]>b[0]?1:-1) : entries.sort((a,b)=>b[1]-a[1]);
-  const max = Math.max(1, ...entries.map(e=>e[1]));
+  entries = config.sortByKey ? entries.sort((a,b)=> a[0]>b[0]?1:-1) : entries.sort((a,b)=>b[1]-a[1]);
   const el = document.getElementById(elId);
   if(!el) return;
-  el.innerHTML = entries.map(([k,v])=>{
-    const label = labelMap ? (labelMap[k]||k) : k;
-    const color = colorMap ? (colorMap[k]||'#2C5C82') : (fallbackColor||'#2C5C82');
+  if(!entries.length || entries.every(e=>e[1]===0)){
+    el.innerHTML = `<div class="chartblock empty-note">ยังไม่มีข้อมูล</div>`;
+    return;
+  }
+  if(chartType==='bar'){
+    renderBarRows(el, entries, config);
+  }else{
+    renderPieChart(el, entries, config, chartType==='donut');
+  }
+  attachDrilldownHandlers(el, config.matchField);
+}
+function chartLabel(config, k){ return config.labelMap ? (config.labelMap[k]||k) : k; }
+function chartColor(config, k, i){
+  if(config.colorMap && config.colorMap[k]) return config.colorMap[k];
+  if(config.fallbackColor) return config.fallbackColor;
+  return CHART_PALETTE[i % CHART_PALETTE.length];
+}
+function renderBarRows(el, entries, config){
+  const max = Math.max(1, ...entries.map(e=>e[1]));
+  el.innerHTML = entries.map(([k,v],i)=>{
+    const label = chartLabel(config,k);
+    const color = chartColor(config,k,i);
     const pct = Math.round((v/max)*100);
-    return `<div class="barrow">
+    return `<div class="barrow" data-value="${escapeAttr(k)}" data-label="${escapeAttr(label)}" style="cursor:pointer;">
       <div class="blbl" title="${label}">${label}</div>
       <div class="btrack"><div class="bfill" style="width:${pct}%; background:${color};"></div></div>
       <div class="bval">${v}</div>
     </div>`;
   }).join('');
 }
-function renderAnalytics(){
-  renderBarChart('chartStatus', countBy(papers,'status'),
-    {unread:'ยังไม่อ่าน',read:'อ่านแล้ว',pass:'ผ่าน',reject:'ไม่ผ่าน'},
-    {unread:'#8A8578',read:'#2C5C82',pass:'#4E7350',reject:'#A24A3D'});
-  renderBarChart('chartLevel', countBy(papers,'level'),
-    {entry:'Entry-level',experienced:'Experienced',both:'ทั้งสองกลุ่ม'},
-    {entry:'#2C5C82',experienced:'#B9812E',both:'#4E7350'});
+function renderPieChart(el, entries, config, isDonut){
+  const total = entries.reduce((s,[,v])=>s+v,0) || 1;
+  let cumulative = 0;
+  const cx=90, cy=90, r=80;
+  const paths = entries.map(([k,v],i)=>{
+    const label = chartLabel(config,k);
+    const color = chartColor(config,k,i);
+    const startAngle = (cumulative/total)*2*Math.PI;
+    cumulative += v;
+    const endAngle = (cumulative/total)*2*Math.PI;
+    const largeArc = (endAngle-startAngle) > Math.PI ? 1 : 0;
+    const x1 = cx + r*Math.sin(startAngle), y1 = cy - r*Math.cos(startAngle);
+    const x2 = cx + r*Math.sin(endAngle), y2 = cy - r*Math.cos(endAngle);
+    let d;
+    if(v>=total){
+      d = `M ${cx} ${cy-r} A ${r} ${r} 0 1 1 ${cx-0.01} ${cy-r} Z`;
+    }else{
+      d = `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+    }
+    return `<path class="pie-slice" d="${d}" fill="${color}" data-value="${escapeAttr(k)}" data-label="${escapeAttr(label)}"><title>${label}: ${v}</title></path>`;
+  }).join('');
+  const donutHole = isDonut ? `<circle cx="${cx}" cy="${cy}" r="${r*0.55}" fill="var(--card)"/>` : '';
+  const legend = entries.map(([k,v],i)=>{
+    const label = chartLabel(config,k);
+    const color = chartColor(config,k,i);
+    return `<div class="legend-item" data-value="${escapeAttr(k)}" data-label="${escapeAttr(label)}"><span class="legend-swatch" style="background:${color}"></span>${label}<span class="lv">${v}</span></div>`;
+  }).join('');
+  el.innerHTML = `<div class="piewrap">
+    <svg viewBox="0 0 180 180" width="180" height="180">${paths}${donutHole}</svg>
+    <div class="chart-legend">${legend}</div>
+  </div>`;
+}
+function attachDrilldownHandlers(el, matchField){
+  if(!matchField) return;
+  el.querySelectorAll('[data-value]').forEach(node=>{
+    node.addEventListener('click', ()=>{
+      drilldown(matchField, node.dataset.value, node.dataset.label);
+    });
+  });
+}
+function drilldown(field, value, label){
+  let matches;
+  if(field==='tags'){
+    matches = papers.filter(p=>p.tags.includes(value));
+  }else if(field==='year'){
+    matches = papers.filter(p=>String(p.year)===String(value));
+  }else{
+    matches = papers.filter(p=>String(p[field])===String(value));
+  }
+  renderDrilldown(label, matches);
+}
+function summarizePaper(p){
+  const parts = [];
+  if(p.method) parts.push(`วิธีวิจัย: ${p.method}`);
+  if(p.tags && p.tags.length) parts.push(`Competency: ${p.tags.join(', ')}`);
+  if(p.notes && p.notes.trim()){
+    parts.push(p.notes.trim().length>140 ? p.notes.trim().slice(0,140)+'…' : p.notes.trim());
+  }
+  return parts.length ? parts.join(' · ') : 'ยังไม่มีบันทึกสรุปสำหรับงานวิจัยนี้';
+}
+function renderDrilldown(label, matches){
+  const block = document.getElementById('drilldownBlock');
+  const list = document.getElementById('paperList');
+  document.getElementById('drilldownTitle').textContent = `งานวิจัยใน: ${label} (${matches.length} รายการ)`;
+  if(!matches.length){
+    list.innerHTML = `<div class="cempty">ไม่พบงานวิจัยในกลุ่มนี้</div>`;
+  }else{
+    list.innerHTML = matches.map(p=>`
+      <div class="paper-item" onclick="openModal('${p.id}')">
+        <div class="pi-title">${escapeHtml(p.title)}</div>
+        <div class="pi-meta">
+          <span>${escapeHtml(p.authors||'ไม่ระบุผู้แต่ง')}</span>
+          <span>· ${escapeHtml(p.country||'-')}</span>
+          <span>· ${p.year}</span>
+          <span class="badge ${p.status}">${statusLabel(p.status)}</span>
+        </div>
+        <div class="pi-summary">${escapeHtml(summarizePaper(p))}</div>
+      </div>
+    `).join('');
+  }
+  block.style.display = 'block';
+  block.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function closeDrilldown(){
+  document.getElementById('drilldownBlock').style.display = 'none';
+}
+function renderAnalytics(keepDrilldown){
+  renderChart('chartStatus', countBy(papers,'status'), {
+    labelMap:{unread:'ยังไม่อ่าน',read:'อ่านแล้ว',pass:'ผ่าน',reject:'ไม่ผ่าน'},
+    colorMap:{unread:'#8A8578',read:'#2C5C82',pass:'#4E7350',reject:'#A24A3D'},
+    matchField:'status'
+  });
+  renderChart('chartLevel', countBy(papers,'level'), {
+    labelMap:{entry:'Entry-level',experienced:'Experienced',both:'ทั้งสองกลุ่ม'},
+    colorMap:{entry:'#2C5C82',experienced:'#B9812E',both:'#4E7350'},
+    matchField:'level'
+  });
   const tagCounts = {};
   ALL_TAGS.forEach(t=>tagCounts[t]=0);
   papers.forEach(p=>p.tags.forEach(t=>{ tagCounts[t]=(tagCounts[t]||0)+1; }));
-  renderBarChart('chartTags', tagCounts, null, TAG_COLORS);
+  renderChart('chartTags', tagCounts, { colorMap:TAG_COLORS, matchField:'tags' });
   const yearCounts = {};
   papers.forEach(p=>{ yearCounts[p.year]=(yearCounts[p.year]||0)+1; });
-  renderBarChart('chartYears', yearCounts, null, null, '#2C5C82', true);
+  renderChart('chartYears', yearCounts, { sortByKey:true, fallbackColor:'#2C5C82', matchField:'year' });
   const countryCounts = countBy(papers,'country');
-  renderBarChart('chartCountries', countryCounts, null, null, '#B9812E');
+  renderChart('chartCountries', countryCounts, { fallbackColor:'#B9812E', matchField:'country' });
+  if(!keepDrilldown){
+    const block = document.getElementById('drilldownBlock');
+    if(block) block.style.display = 'none';
+  }
 }
 
 /* ================= INIT ================= */
