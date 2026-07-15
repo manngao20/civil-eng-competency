@@ -269,7 +269,40 @@
   .barrow .btrack{flex:1; background:var(--paper); border:1px solid var(--paper-line); height:18px; position:relative;}
   .barrow .bfill{height:100%;}
   .barrow .bval{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; width:26px; text-align:left; flex-shrink:0;}
+.analytics-toolbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+}
 
+.analytics-toolbar select{
+    padding:8px 12px;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:6px;
+    cursor:pointer;
+}
+
+#paperList{
+    margin-top:20px;
+}
+
+.paper-item{
+    padding:12px;
+    margin-bottom:10px;
+    border:1px solid var(--paper-line);
+    background:var(--card);
+    border-radius:6px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.paper-item:hover{
+    background:var(--paper);
+}
   /* duplicate check + notif log */
   .dupwarn{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brick); margin-top:6px; line-height:1.6;}
   .dupwarn a{color:var(--brick); text-decoration:underline;}
