@@ -500,11 +500,9 @@
         <h3>ตามประเทศ/ภูมิภาค</h3>
         <div id="chartCountries"></div>
       </div>
-      <div class="chartblock full">
-        <h3>ประวัติการแจ้งเตือน (Notification Log) <span class="notifbadge off" id="notifStatusBadge">EMAIL: OFF</span></h3>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:10px;">แจ้งเตือนไปยัง <b>s6603061612096@email.kmutnb.ac.th</b> เมื่อมีคอมเมนต์จากอาจารย์ / มีการตรวจงานวิจัย / มีการเพิ่มงานวิจัยใหม่</div>
-        <div id="notifLog"></div>
-      </div>
+    </div>
+    <div style="text-align:right; margin-top:18px;">
+      <span onclick="requestPassGate('ใส่รหัสผ่านเพื่อดูประวัติการทำรายการ', ()=>openActivityLog())" style="cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); text-decoration:underline; opacity:.6;" title="ประวัติการทำรายการ">⋯ ประวัติการทำรายการ</span>
     </div>
   </section>
 
@@ -561,6 +559,21 @@
   </div>
 </div>
 
+<!-- ===== Activity log overlay (password protected) ===== -->
+<div class="overlay" id="activityLogOverlay">
+  <div class="modal">
+    <div class="mhead">
+      <h3>ประวัติการทำรายการ</h3>
+      <button class="mclose" onclick="closeActivityLog()">✕</button>
+    </div>
+    <div class="mbody" id="activityLogBody"></div>
+    <div class="mfoot">
+      <span></span>
+      <button class="btn ghost" onclick="closeActivityLog()">ปิด</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== Delete confirm overlay ===== -->
 <div class="overlay" id="deleteOverlay">
   <div class="confirm-modal">
@@ -613,39 +626,8 @@
 
 <!-- Storage shim: makes window.storage work on a plain static host (see storage-shim.js) -->
 <script src="storage-shim.js"></script>
-<!-- EmailJS (optional): enables real automatic email sending, see EMAILJS_CONFIG below -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <script>
-/* ================= EMAIL NOTIFICATION CONFIG =================
-   This site is a static front-end file — a browser page cannot send
-   real email on its own. To make the "แจ้งเตือน" below actually land
-   in the inbox automatically (no manual click), this uses EmailJS
-   (a free client-side email service). Steps:
-     1) Create a free account at https://www.emailjs.com
-     2) Add an Email Service (e.g. Gmail) -> get a Service ID
-     3) Create an Email Template with variables {{subject}} and
-        {{message}} and {{to_email}} -> get a Template ID
-     4) Get your Public Key from Account > API Keys
-     5) Paste the 3 values below and set enabled:true
-   Until you do that, notifications are still recorded in the
-   "ประวัติการแจ้งเตือน" log on the Analytics page (stored via
-   window.storage), so nothing is lost — they just won't hit the
-   inbox automatically until EmailJS is configured.
-================================================================= */
-const EMAILJS_CONFIG = {
-  enabled: false,
-  serviceId: 'YOUR_SERVICE_ID',
-  templateId: 'YOUR_TEMPLATE_ID',
-  publicKey: 'YOUR_PUBLIC_KEY',
-  notifyEmail: 's6603061612096@email.kmutnb.ac.th'
-};
-try{
-  if(EMAILJS_CONFIG.enabled && window.emailjs && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey!=='YOUR_PUBLIC_KEY'){
-    emailjs.init(EMAILJS_CONFIG.publicKey);
-  }
-}catch(e){}
-
 /* ================= DATA ================= */
 const TAG_COLORS = {
   "Technical":"#2C5C82","Project Management":"#B9812E","Leadership":"#A24A3D",
@@ -653,6 +635,20 @@ const TAG_COLORS = {
   "Ethics":"#3E6E6E","Sustainability":"#5A7D3A"
 };
 const ALL_TAGS = Object.keys(TAG_COLORS);
+
+const METHOD_OPTIONS = [
+  "แบบสอบถาม (Survey)",
+  "การสัมภาษณ์ (Interview)",
+  "การสนทนากลุ่ม (Focus Group)",
+  "ทบทวนวรรณกรรมอย่างเป็นระบบ (Systematic Literature Review)",
+  "วิธีเดลฟาย (Delphi Method)",
+  "กรณีศึกษา (Case Study)",
+  "การวิเคราะห์เนื้อหา (Content Analysis)",
+  "แบบผสมผสาน เชิงปริมาณ+คุณภาพ (Mixed Methods)",
+  "การวิเคราะห์เชิงบรรณมิติ (Bibliometric Analysis)",
+  "เอกสารกรอบแนวคิด/นโยบาย (Framework / Policy Document)",
+  "การวิเคราะห์เปรียบเทียบ (Comparative Analysis)"
+];
 
 const SEED_PAPERS = [
 {id:"p1", title:"Competency-Based Framework for Civil Engineers (Bhutan)", authors:"Royal Civil Service Commission, Bhutan", year:2019, venue:"RCSC Bhutan Report", country:"Bhutan", url:"https://www.rcsc.gov.bt/wp-content/uploads/2019/06/Civil-Engineer-Competency-Framework.pdf", level:"both", tags:["Technical","Project Management"], method:"Framework / policy document", status:"unread", feedback:"", notes:"", comments:[]},
@@ -733,9 +729,6 @@ async function loadAll(){
   renderTagFilter();
   renderPapers();
   renderAnalytics();
-  renderNotifLog();
-  document.getElementById('notifStatusBadge').textContent = (EMAILJS_CONFIG.enabled ? 'EMAIL: ON' : 'EMAIL: OFF (ตั้งค่า EmailJS เพื่อเปิด)');
-  document.getElementById('notifStatusBadge').classList.toggle('off', !EMAILJS_CONFIG.enabled);
 }
 async function savePapers(){
   try{ await window.storage.set('papers-v1', JSON.stringify(papers), true); }catch(e){}
@@ -749,7 +742,7 @@ function goPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.p===p));
-  if(p==='stats'){ renderAnalytics(); renderNotifLog(); }
+  if(p==='stats'){ renderAnalytics(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function setRole(v){ role = v; }
@@ -830,23 +823,9 @@ document.addEventListener('input', (e)=>{
   }
 });
 
-/* ================= NOTIFICATIONS ================= */
+/* ================= ACTIVITY LOG (internal record, no email — password protected) ================= */
 async function sendNotification(subject, message){
-  const entry = {subject, message, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}), sent:false};
-  if(EMAILJS_CONFIG.enabled && window.emailjs && EMAILJS_CONFIG.publicKey!=='YOUR_PUBLIC_KEY'){
-    try{
-      await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-        to_email: EMAILJS_CONFIG.notifyEmail,
-        subject: subject,
-        message: message
-      });
-      entry.sent = true;
-    }catch(e){
-      entry.sent = false;
-      entry.error = 'ส่งอีเมลไม่สำเร็จ (ตรวจสอบการตั้งค่า EmailJS)';
-      console.error('EmailJS send failed', e);
-    }
-  }
+  const entry = {subject, message, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})};
   try{
     const key = 'notif-log-v1';
     let log = [];
@@ -855,20 +834,26 @@ async function sendNotification(subject, message){
     log = log.slice(0, 60);
     await window.storage.set(key, JSON.stringify(log), true);
   }catch(e){}
-  renderNotifLog();
 }
-async function renderNotifLog(){
-  const el = document.getElementById('notifLog');
+function openActivityLog(){
+  renderActivityLog();
+  document.getElementById('activityLogOverlay').classList.add('show');
+}
+function closeActivityLog(){
+  document.getElementById('activityLogOverlay').classList.remove('show');
+}
+async function renderActivityLog(){
+  const el = document.getElementById('activityLogBody');
   if(!el) return;
   let log = [];
   try{ const r = await window.storage.get('notif-log-v1', true); log = JSON.parse(r.value) || []; }catch(e){}
   if(!log.length){
-    el.innerHTML = `<div class="notifempty">ยังไม่มีการแจ้งเตือน</div>`;
+    el.innerHTML = `<div class="notifempty">ยังไม่มีประวัติการทำรายการ</div>`;
     return;
   }
   el.innerHTML = log.map(n=>`
     <div class="notifitem">
-      <div class="nh"><span>${n.time}${n.sent ? ' · ส่งอีเมลแล้ว ✓' : (EMAILJS_CONFIG.enabled ? ' · ส่งไม่สำเร็จ' : ' · บันทึกไว้ (ยังไม่ได้ตั้งค่าอีเมล)')}</span></div>
+      <div class="nh"><span>${n.time}</span></div>
       <b>${escapeHtml(n.subject)}</b><br>${escapeHtml(n.message)}
     </div>
   `).join('');
@@ -1229,7 +1214,13 @@ function openModal(id){
       ${p.mySummaryUrl ? `<div style="margin-top:6px;"><a class="srclink" href="${p.mySummaryUrl}" target="_blank">เปิดดูสรุป ↗</a></div>` : ''}
     </div>
     <div class="mfield"><label>ประเทศ / ภูมิภาค</label><input id="f-country" value="${p.country}" ${role==='advisor'?'disabled':''}></div>
-    <div class="mfield"><label>วิธีวิจัย</label><input id="f-method" value="${p.method}" ${role==='advisor'?'disabled':''}></div>
+    <div class="mfield"><label>ลักษณะการทำสำรวจวิจัย (Research Method)</label>
+      <select id="f-method-select" onchange="onMethodSelectChange()" ${role==='advisor'?'disabled':''}>
+        ${METHOD_OPTIONS.map(o=>`<option value="${escapeAttr(o)}" ${p.method===o?'selected':''}>${o}</option>`).join('')}
+        <option value="__other__" ${!METHOD_OPTIONS.includes(p.method)?'selected':''}>อื่นๆ (ระบุเอง)</option>
+      </select>
+      <input id="f-method-custom" style="margin-top:8px; display:${!METHOD_OPTIONS.includes(p.method)?'block':'none'};" placeholder="ระบุลักษณะการทำวิจัยเอง เช่น Survey ผสม interview กลุ่มตัวอย่าง n=..." value="${escapeAttr(!METHOD_OPTIONS.includes(p.method)?p.method:'')}" ${role==='advisor'?'disabled':''}>
+    </div>
     <div class="mfield"><label>กลุ่มวิศวกร</label>
       <select id="f-level" ${role==='advisor'?'disabled':''}>
         <option value="entry" ${p.level==='entry'?'selected':''}>Entry-level</option>
@@ -1272,7 +1263,18 @@ function openModal(id){
   renderComments(p);
   checkDupLive();
 }
-function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+function escapeAttr(s){ return String(s===undefined||s===null?'':s).replace(/"/g,'&quot;'); }
+function onMethodSelectChange(){
+  const sel = document.getElementById('f-method-select');
+  const custom = document.getElementById('f-method-custom');
+  if(!sel || !custom) return;
+  if(sel.value === '__other__'){
+    custom.style.display = 'block';
+    custom.focus();
+  }else{
+    custom.style.display = 'none';
+  }
+}
 function pickStatus(s){
   document.querySelectorAll('#statusRow .sbtn').forEach(b=>b.className='sbtn'+(b.dataset.s===s?' active-'+s:''));
   document.getElementById('statusRow').dataset.picked = s;
@@ -1301,7 +1303,16 @@ async function saveModal(){
   const urlEl = document.getElementById('f-url'); if(urlEl && !urlEl.disabled) p.url = urlEl.value.trim();
   const summary = document.getElementById('f-summary'); if(summary && !summary.disabled) p.mySummaryUrl = summary.value.trim();
   const country = document.getElementById('f-country'); if(country && !country.disabled) p.country = country.value;
-  const method = document.getElementById('f-method'); if(method && !method.disabled) p.method = method.value;
+  const methodSel = document.getElementById('f-method-select');
+  const methodCustom = document.getElementById('f-method-custom');
+  if(methodSel && !methodSel.disabled){
+    if(methodSel.value === '__other__'){
+      const customVal = (methodCustom ? methodCustom.value.trim() : '');
+      if(customVal) p.method = customVal;
+    }else{
+      p.method = methodSel.value;
+    }
+  }
   const level = document.getElementById('f-level'); if(level && !level.disabled) p.level = level.value;
   const tagGrid = document.getElementById('tagCheckGrid');
   if(tagGrid){
