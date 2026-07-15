@@ -153,6 +153,26 @@
   .navcard p{margin:0; font-size:13px; color:var(--ink-soft); line-height:1.5; flex:1;}
   .navcard .go{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase;}
 
+  /* ===== goal stats (home) ===== */
+  .goalstats{margin:0 0 56px;}
+  .goalstats-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; gap:12px;}
+  .goal-add-form{display:none; gap:8px; flex-wrap:wrap; border:1.3px solid var(--ink); background:var(--card); padding:14px; margin-bottom:14px;}
+  .goal-add-form.show{display:flex;}
+  .goal-add-form input, .goal-add-form select{padding:8px 10px; border:1.3px solid var(--ink); background:var(--paper); font-family:'IBM Plex Sans'; font-size:12.5px; border-radius:2px;}
+  .goal-add-form input[type=text]{flex:2; min-width:160px;}
+  .goal-add-form input[type=number]{width:90px;}
+  .goalgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  .goalcard{border:1.3px solid var(--ink); background:var(--card); padding:16px 18px; cursor:pointer; transition:.15s;}
+  .goalcard:hover{background:var(--blue-pale);}
+  .goalcard .ghead{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;}
+  .goalcard .glabel{font-size:14px; font-weight:600;}
+  .goalcard .gnum{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); white-space:nowrap;}
+  .goalcard .gdel{background:none; border:none; cursor:pointer; color:var(--ink-soft); font-size:13px; padding:2px 4px;}
+  .goalcard .gdel:hover{color:var(--brick);}
+  .gtrack{background:var(--paper); border:1px solid var(--paper-line); height:16px; position:relative; overflow:hidden;}
+  .gfill{height:100%; background:var(--moss); transition:width .3s;}
+  .goalempty{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+
   /* ===== PROCESS PAGE ===== */
   .timeline{position:relative; padding-left:52px; margin-top:30px;}
   .timeline::before{content:""; position:absolute; left:19px; top:6px; bottom:6px; width:1.5px; background:var(--ink); background-image:linear-gradient(var(--ink) 60%, transparent 0); background-size:1.5px 8px;}
@@ -368,6 +388,7 @@
     .barrow .blbl{width:100px; font-size:10px;}
     .caddrow{flex-direction:column;}
     .summary-pop{right:auto; left:0; width:min(260px, 80vw);}
+    .goalgrid{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -449,6 +470,26 @@
 
     <div class="statrow" id="statrow"></div>
 
+    <div class="goalstats">
+      <div class="goalstats-head">
+        <h2 style="font-size:22px; font-weight:500; font-style:italic; margin:0;">เป้าหมายการทำงาน</h2>
+        <button class="btn ghost" style="padding:8px 14px; font-size:11px;" onclick="toggleGoalForm()">+ เพิ่มเป้าหมาย</button>
+      </div>
+      <div class="goal-add-form" id="goalAddForm">
+        <input type="text" id="goalLabelInput" placeholder="ชื่อเป้าหมาย เช่น เก็บงานวิจัยทั้งหมด">
+        <input type="number" id="goalTargetInput" placeholder="เป้าหมาย" min="1">
+        <select id="goalFieldInput">
+          <option value="total">จำนวนงานวิจัยทั้งหมด</option>
+          <option value="pass">ผ่านการคัดเลือก</option>
+          <option value="read">อ่านแล้ว (รวมผ่าน/ไม่ผ่าน)</option>
+          <option value="reject">ไม่ผ่าน</option>
+        </select>
+        <button class="btn" style="padding:9px 14px; font-size:11px;" onclick="addGoal()">เพิ่ม</button>
+        <button class="btn ghost" style="padding:9px 14px; font-size:11px;" onclick="toggleGoalForm()">ยกเลิก</button>
+      </div>
+      <div class="goalgrid" id="goalGrid"></div>
+    </div>
+
     <div class="section-head"><h2>เข้าสู่แต่ละส่วนของงานวิจัย</h2></div>
     <div class="home-grid">
       <div class="navcard" onclick="goPage('process')">
@@ -488,7 +529,7 @@
       <div class="note" id="papersNote">รอบแรก: ค้นด้วย web search จริง</div>
     </div>
     <div class="toolbar">
-      <input type="text" id="searchBox" placeholder="ค้นหาชื่อเรื่อง / ผู้แต่ง / ประเทศ..." oninput="renderPapers()">
+      <input type="text" id="searchBox" placeholder="ค้นหาชื่อเรื่อง / ผู้แต่ง / ประเทศ / คำสำคัญ เช่น ทักษะการบริหาร..." oninput="renderPapers()">
       <select class="filt" id="filtStatus" onchange="renderPapers()">
         <option value="">ทุกสถานะ</option>
         <option value="unread">ยังไม่อ่าน</option>
@@ -535,7 +576,6 @@
       <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em;">รูปแบบกราฟ:</span>
       <button type="button" class="btn ghost ctbtn active" data-t="bar" onclick="setChartType('bar')">▭ แท่ง (Bar)</button>
       <button type="button" class="btn ghost ctbtn" data-t="pie" onclick="setChartType('pie')">◐ วงกลม (Pie)</button>
-      <button type="button" class="btn ghost ctbtn" data-t="donut" onclick="setChartType('donut')">◎ โดนัท (Donut)</button>
       <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-left:auto;">💡 คลิกที่แท่ง/ชิ้นกราฟ เพื่อดูรายชื่องานวิจัยในกลุ่มนั้น</span>
     </div>
     <div class="analytics-grid">
@@ -757,6 +797,7 @@ const PROCESS_STEPS = [
 /* ================= STATE ================= */
 let papers = [];
 let trash = [];
+let goals = [];
 let draftPaper = null;
 let isAddingNew = false;
 let siteConfig = {
@@ -790,9 +831,17 @@ async function loadAll(){
   }catch(e){
     try{ await window.storage.set('site-config-v1', JSON.stringify(siteConfig), true); }catch(e2){}
   }
+  try{
+    const r3 = await window.storage.get('goals-v1', true);
+    goals = JSON.parse(r3.value) || [];
+  }catch(e){
+    goals = [{id:'g1', label:'เก็บงานวิจัยทั้งหมด', target:100, field:'total'}, {id:'g2', label:'ผ่านการคัดเลือก', target:15, field:'pass'}];
+    try{ await window.storage.set('goals-v1', JSON.stringify(goals), true); }catch(e2){}
+  }
   await loadTrash();
   applyConfig();
   renderStats();
+  renderGoals();
   renderProcess();
   renderTagFilter();
   renderPapers();
@@ -803,6 +852,9 @@ async function savePapers(){
 }
 async function saveConfig(){
   try{ await window.storage.set('site-config-v1', JSON.stringify(siteConfig), true); }catch(e){}
+}
+async function saveGoals(){
+  try{ await window.storage.set('goals-v1', JSON.stringify(goals), true); }catch(e){}
 }
 
 /* ================= NAV ================= */
@@ -890,6 +942,65 @@ document.addEventListener('input', (e)=>{
     window.__cfgT = setTimeout(saveConfig, 600);
   }
 });
+
+/* ================= GOAL STATS (home) ================= */
+function toggleGoalForm(){
+  document.getElementById('goalAddForm').classList.toggle('show');
+}
+function goalCount(field){
+  if(field==='total') return papers.length;
+  if(field==='pass') return papers.filter(p=>p.status==='pass').length;
+  if(field==='reject') return papers.filter(p=>p.status==='reject').length;
+  if(field==='read') return papers.filter(p=>p.status==='pass'||p.status==='reject').length;
+  return 0;
+}
+async function addGoal(){
+  const label = document.getElementById('goalLabelInput').value.trim();
+  const target = parseInt(document.getElementById('goalTargetInput').value, 10);
+  const field = document.getElementById('goalFieldInput').value;
+  if(!label || !target || target<1) return;
+  goals.push({id:'g'+Date.now(), label, target, field});
+  document.getElementById('goalLabelInput').value='';
+  document.getElementById('goalTargetInput').value='';
+  toggleGoalForm();
+  await saveGoals();
+  renderGoals();
+}
+async function deleteGoal(id, ev){
+  if(ev) ev.stopPropagation();
+  goals = goals.filter(g=>g.id!==id);
+  await saveGoals();
+  renderGoals();
+}
+function goalClick(field){
+  goPage('stats');
+  setTimeout(()=>{
+    if(field==='total'){ renderDrilldown('งานวิจัยทั้งหมด', papers); }
+    else if(field==='pass'){ drilldown('status','pass','ผ่าน'); }
+    else if(field==='reject'){ drilldown('status','reject','ไม่ผ่าน'); }
+    else if(field==='read'){ renderDrilldown('อ่านแล้ว (ผ่าน/ไม่ผ่าน)', papers.filter(p=>p.status==='pass'||p.status==='reject')); }
+  }, 80);
+}
+function renderGoals(){
+  const grid = document.getElementById('goalGrid');
+  if(!grid) return;
+  if(!goals.length){
+    grid.innerHTML = `<div class="goalempty">ยังไม่มีเป้าหมาย — กด "+ เพิ่มเป้าหมาย" เพื่อตั้งเป้า</div>`;
+    return;
+  }
+  grid.innerHTML = goals.map(g=>{
+    const cur = goalCount(g.field);
+    const pct = Math.min(100, Math.round((cur/g.target)*100));
+    return `<div class="goalcard" onclick="goalClick('${g.field}')">
+      <div class="ghead">
+        <span class="glabel">${escapeHtml(g.label)}</span>
+        <span class="gnum">${cur} / ${g.target}</span>
+        <button class="gdel" onclick="deleteGoal('${g.id}', event)" title="ลบเป้าหมาย">✕</button>
+      </div>
+      <div class="gtrack"><div class="gfill" style="width:${pct}%; ${cur>=g.target?'background:var(--blue-deep);':''}"></div></div>
+    </div>`;
+  }).join('');
+}
 
 /* ================= ACTIVITY LOG (internal record, no email — password protected) ================= */
 async function sendNotification(subject, message){
@@ -1081,7 +1192,7 @@ async function confirmDelete(){
   await moveToTrash(removed);
   closeDeleteConfirm();
   if(currentModalPaperId===deleteTargetId){ closeModal(); }
-  renderPapers(); renderStats(); renderAnalytics();
+  renderPapers(); renderStats(); renderGoals(); renderAnalytics();
   sendNotification(`มีการย้ายงานวิจัยไปถังขยะ`, `"${removed.title}" ถูกย้ายไปถังขยะโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'} (กู้คืนได้ที่หน้าถังขยะ)`);
 }
 
@@ -1146,7 +1257,7 @@ async function restoreFromTrash(idx){
   papers.push(item.paper);
   await savePapers();
   await saveTrash();
-  renderPapers(); renderStats(); renderAnalytics(); renderTrashList();
+  renderPapers(); renderStats(); renderGoals(); renderAnalytics(); renderTrashList();
   sendNotification('กู้คืนงานวิจัยจากถังขยะ', `"${item.paper.title}" ถูกกู้คืนโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
 }
 function requestPermanentDelete(idx){
@@ -1197,8 +1308,31 @@ function renderTagFilter(){
 }
 
 /* ================= PAPERS TABLE ================= */
+/* keyword synonym map so Thai/English search terms match related competency tags & content */
+const SEARCH_SYNONYMS = {
+  "Project Management": ["บริหาร","การจัดการ","จัดการโครงการ","management","บริหารโครงการ","บริหารจัดการ"],
+  "Leadership": ["ผู้นำ","ภาวะผู้นำ","leadership","leader"],
+  "Communication": ["สื่อสาร","communication","ทักษะการสื่อสาร"],
+  "Technical": ["เทคนิค","วิชาการ","technical","engineering skill"],
+  "Digital/BIM": ["ดิจิทัล","บิม","bim","digital","technology","เทคโนโลยี"],
+  "Employability": ["การมีงานทำ","จ้างงาน","employability","ทักษะการทำงาน","skill"],
+  "Ethics": ["จริยธรรม","จรรยาบรรณ","ethics"],
+  "Sustainability": ["ความยั่งยืน","sustainability","sustainable"]
+};
+function keywordMatchesPaper(p, q){
+  const hay = (p.title+' '+p.authors+' '+p.country+' '+(p.method||'')+' '+(p.notes||'')+' '+p.tags.join(' ')).toLowerCase();
+  if(hay.includes(q)) return true;
+  // check synonym groups: if query matches a synonym of a tag, and paper has that tag -> match
+  for(const tag of ALL_TAGS){
+    const words = [tag.toLowerCase(), ...(SEARCH_SYNONYMS[tag]||[]).map(w=>w.toLowerCase())];
+    if(words.some(w=>q.includes(w) || w.includes(q))){
+      if(p.tags.includes(tag)) return true;
+    }
+  }
+  return false;
+}
 function getFilteredPapers(){
-  const q = document.getElementById('searchBox').value.toLowerCase();
+  const q = document.getElementById('searchBox').value.toLowerCase().trim();
   const fs = document.getElementById('filtStatus').value;
   const fl = document.getElementById('filtLevel').value;
   const ft = document.getElementById('filtTag').value;
@@ -1206,10 +1340,7 @@ function getFilteredPapers(){
     if(fs && p.status!==fs) return false;
     if(fl && p.level!==fl) return false;
     if(ft && !p.tags.includes(ft)) return false;
-    if(q){
-      const hay = (p.title+' '+p.authors+' '+p.country).toLowerCase();
-      if(!hay.includes(q)) return false;
-    }
+    if(q && !keywordMatchesPaper(p, q)) return false;
     return true;
   });
 }
@@ -1402,7 +1533,7 @@ async function saveModal(){
   }
 
   await savePapers();
-  renderPapers(); renderStats(); renderAnalytics();
+  renderPapers(); renderStats(); renderGoals(); renderAnalytics();
 
   if(isNew){
     sendNotification('มีการเพิ่มงานวิจัยใหม่', `"${p.title}" ถูกเพิ่มโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
@@ -1465,7 +1596,7 @@ async function addComment(){
 }
 
 /* ================= ANALYTICS ================= */
-let chartType = 'bar'; // 'bar' | 'pie' | 'donut'
+let chartType = 'bar'; // 'bar' | 'pie'
 const CHART_PALETTE = ['#2C5C82','#B9812E','#A24A3D','#4E7350','#6B5B95','#8A6D3B','#3E6E6E','#5A7D3A','#7A5C4A','#456B8C','#C2703C','#3E7D6E'];
 
 function countBy(arr, key){
@@ -1493,7 +1624,7 @@ function renderChart(elId, dataObj, config){
   if(chartType==='bar'){
     renderBarRows(el, entries, config);
   }else{
-    renderPieChart(el, entries, config, chartType==='donut');
+    renderPieChart(el, entries, config);
   }
   attachDrilldownHandlers(el, config.matchField);
 }
@@ -1516,7 +1647,7 @@ function renderBarRows(el, entries, config){
     </div>`;
   }).join('');
 }
-function renderPieChart(el, entries, config, isDonut){
+function renderPieChart(el, entries, config){
   const total = entries.reduce((s,[,v])=>s+v,0) || 1;
   let cumulative = 0;
   const cx=90, cy=90, r=80;
@@ -1537,14 +1668,13 @@ function renderPieChart(el, entries, config, isDonut){
     }
     return `<path class="pie-slice" d="${d}" fill="${color}" data-value="${escapeAttr(k)}" data-label="${escapeAttr(label)}"><title>${label}: ${v}</title></path>`;
   }).join('');
-  const donutHole = isDonut ? `<circle cx="${cx}" cy="${cy}" r="${r*0.55}" fill="var(--card)"/>` : '';
   const legend = entries.map(([k,v],i)=>{
     const label = chartLabel(config,k);
     const color = chartColor(config,k,i);
     return `<div class="legend-item" data-value="${escapeAttr(k)}" data-label="${escapeAttr(label)}"><span class="legend-swatch" style="background:${color}"></span>${label}<span class="lv">${v}</span></div>`;
   }).join('');
   el.innerHTML = `<div class="piewrap">
-    <svg viewBox="0 0 180 180" width="180" height="180">${paths}${donutHole}</svg>
+    <svg viewBox="0 0 180 180" width="180" height="180">${paths}</svg>
     <div class="chart-legend">${legend}</div>
   </div>`;
 }
@@ -1619,9 +1749,9 @@ function renderAnalytics(keepDrilldown){
   renderChart('chartTags', tagCounts, { colorMap:TAG_COLORS, matchField:'tags' });
   const yearCounts = {};
   papers.forEach(p=>{ yearCounts[p.year]=(yearCounts[p.year]||0)+1; });
-  renderChart('chartYears', yearCounts, { sortByKey:true, fallbackColor:'#2C5C82', matchField:'year' });
+  renderChart('chartYears', yearCounts, { sortByKey:true, matchField:'year' });
   const countryCounts = countBy(papers,'country');
-  renderChart('chartCountries', countryCounts, { fallbackColor:'#B9812E', matchField:'country' });
+  renderChart('chartCountries', countryCounts, { matchField:'country' });
   if(!keepDrilldown){
     const block = document.getElementById('drilldownBlock');
     if(block) block.style.display = 'none';
