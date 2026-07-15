@@ -284,6 +284,14 @@
   .notifbadge{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:9.5px; padding:2px 7px; border-radius:2px; background:var(--blue-pale); color:var(--blue-deep); margin-left:6px;}
   .notifbadge.off{background:#E7E3D8; color:var(--ink-soft);}
 
+  /* trash */
+  .trashrow{border:1.3px solid var(--ink); background:var(--card); padding:12px 14px; margin-bottom:10px; border-radius:2px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;}
+  .trashrow .trinfo{flex:1; min-width:200px;}
+  .trashrow .trtitle{font-size:13.5px; font-weight:600; margin-bottom:3px;}
+  .trashrow .trmeta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft);}
+  .trashrow .tractions{display:flex; gap:6px; flex-shrink:0;}
+  .trashempty{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);}
+
   /* delete confirm overlay */
   .confirm-modal{background:var(--paper); border:1.5px solid var(--brick); max-width:420px; width:100%; margin-bottom:40px;}
   .confirm-modal .mhead{background:var(--brick); color:var(--paper);}
@@ -448,6 +456,7 @@
       <button class="btn ghost" style="padding:9px 14px;" onclick="exportCSV()">⬇ Export CSV</button>
       <button class="btn ghost" style="padding:9px 14px;" onclick="openAddModal()">+ เพิ่มงานวิจัย</button>
       <button class="btn ghost" style="padding:9px 14px;" onclick="openDupCheck()">🔍 ตรวจสอบงานซ้ำ</button>
+      <button class="btn ghost" style="padding:9px 14px;" onclick="openTrash()">🗑 ถังขยะ <span id="trashCount" class="notifbadge" style="margin-left:4px;">0</span></button>
     </div>
     <div class="counts" id="counts"></div>
     <table class="papers">
@@ -512,7 +521,7 @@
     </div>
     <div class="mbody" id="mBody"></div>
     <div class="mfoot">
-      <button class="btn danger ghost" style="padding:9px 14px;" onclick="requestDeleteFromModal()">🗑 ลบงานวิจัยนี้</button>
+      <button class="btn danger ghost" id="modalDeleteBtn" style="padding:9px 14px;" onclick="requestDeleteFromModal()">🗑 ลบงานวิจัยนี้</button>
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="savedmsg" id="savedMsg">บันทึกแล้ว ✓</span>
         <button class="btn ghost" onclick="closeModal()">ปิด</button>
@@ -537,6 +546,21 @@
   </div>
 </div>
 
+<!-- ===== Trash overlay ===== -->
+<div class="overlay" id="trashOverlay">
+  <div class="modal">
+    <div class="mhead">
+      <h3>ถังขยะ</h3>
+      <button class="mclose" onclick="closeTrash()">✕</button>
+    </div>
+    <div class="mbody" id="trashBody"></div>
+    <div class="mfoot">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);">รายการในถังขยะจะถูกเก็บไว้จนกว่าจะลบถาวร</span>
+      <button class="btn ghost" onclick="closeTrash()">ปิด</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== Delete confirm overlay ===== -->
 <div class="overlay" id="deleteOverlay">
   <div class="confirm-modal">
@@ -545,10 +569,10 @@
       <button class="mclose" onclick="closeDeleteConfirm()">✕</button>
     </div>
     <div class="mbody">
-      คุณต้องการลบงานวิจัยนี้ออกจากฐานข้อมูลใช่หรือไม่? การลบไม่สามารถย้อนกลับได้
+      คุณต้องการย้ายงานวิจัยนี้ไปถังขยะใช่หรือไม่? สามารถกู้คืนได้ภายหลังจากหน้าถังขยะ
       <b id="deleteTargetTitle"></b>
       <div class="mfield" style="margin-top:14px;">
-        <label>ใส่รหัสผ่านเพื่อยืนยันการลบ</label>
+        <label>ใส่รหัสผ่านเพื่อยืนยัน</label>
         <input type="password" id="deletePassInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter'){confirmDelete();}">
         <div class="dupwarn" id="deletePassError" style="display:none;">รหัสผ่านไม่ถูกต้อง</div>
       </div>
@@ -557,7 +581,7 @@
       <span></span>
       <div style="display:flex; gap:8px;">
         <button class="btn ghost" onclick="closeDeleteConfirm()">ยกเลิก</button>
-        <button class="btn danger" onclick="confirmDelete()">ลบเลย</button>
+        <button class="btn danger" onclick="confirmDelete()">ย้ายไปถังขยะ</button>
       </div>
     </div>
   </div>
@@ -668,6 +692,9 @@ const PROCESS_STEPS = [
 
 /* ================= STATE ================= */
 let papers = [];
+let trash = [];
+let draftPaper = null;
+let isAddingNew = false;
 let siteConfig = {
   univ:"King Mongkut's University of Technology North Bangkok",
   dept:"Department of Civil and Environmental Engineering Technology (CvET)",
@@ -699,6 +726,7 @@ async function loadAll(){
   }catch(e){
     try{ await window.storage.set('site-config-v1', JSON.stringify(siteConfig), true); }catch(e2){}
   }
+  await loadTrash();
   applyConfig();
   renderStats();
   renderProcess();
@@ -859,6 +887,15 @@ function titleSimilarity(a,b){
   const union = new Set([...wa,...wb]).size;
   return union ? inter/union : 0;
 }
+function normalizeUrl(u){
+  if(!u) return '';
+  let s = String(u).trim().toLowerCase();
+  s = s.replace(/^https?:\/\//,'');
+  s = s.replace(/^www\./,'');
+  s = s.split('#')[0].split('?')[0];
+  s = s.replace(/\/+$/,'');
+  return s;
+}
 function findDuplicatePairs(threshold){
   threshold = threshold || 0.45;
   const dups = [];
@@ -866,9 +903,9 @@ function findDuplicatePairs(threshold){
     for(let j=i+1;j<papers.length;j++){
       const p1=papers[i], p2=papers[j];
       let sim = titleSimilarity(p1.title, p2.title);
-      const u1 = (p1.url||'').trim().replace(/\/$/,'');
-      const u2 = (p2.url||'').trim().replace(/\/$/,'');
-      const sameUrl = u1 && u2 && u1!=='https:' && u1===u2;
+      const u1 = normalizeUrl(p1.url);
+      const u2 = normalizeUrl(p2.url);
+      const sameUrl = !!(u1 && u2 && u1===u2);
       if(sameUrl) sim = Math.max(sim, 1);
       if(sim >= threshold) dups.push({p1,p2,sim,sameUrl});
     }
@@ -896,15 +933,29 @@ function closeDupCheck(){
   document.getElementById('dupOverlay').classList.remove('show');
 }
 function checkDupLive(){
-  const val = document.getElementById('f-title') ? document.getElementById('f-title').value : '';
+  const titleEl = document.getElementById('f-title');
+  const urlEl = document.getElementById('f-url');
+  const titleVal = titleEl ? titleEl.value : '';
+  const urlVal = urlEl ? urlEl.value : '';
   const warnEl = document.getElementById('dupLiveWarn');
-  if(!warnEl) return;
-  if(!val || val.trim().length<4){ warnEl.innerHTML=''; return; }
-  const matches = papers.filter(p=>p.id!==currentModalPaperId && titleSimilarity(p.title, val) >= 0.45);
-  if(matches.length){
-    warnEl.innerHTML = `⚠️ อาจซ้ำกับ ${matches.length} รายการ: ` + matches.map(m=>`<a href="#" onclick="event.preventDefault();closeModal();openModal('${m.id}')">${escapeHtml(m.title)}</a>`).join(', ');
-  }else{
-    warnEl.innerHTML = '';
+  const warnUrlEl = document.getElementById('dupLiveWarnUrl');
+  const excludeId = currentModalPaperId;
+  if(warnEl){
+    if(titleVal && titleVal.trim().length>=4){
+      const matches = papers.filter(p=>p.id!==excludeId && titleSimilarity(p.title, titleVal) >= 0.45);
+      warnEl.innerHTML = matches.length ? `⚠️ ชื่อเรื่องอาจซ้ำกับ ${matches.length} รายการ: ` + matches.map(m=>`<a href="#" onclick="event.preventDefault();closeModal();openModal('${m.id}')">${escapeHtml(m.title)}</a>`).join(', ') : '';
+    }else{
+      warnEl.innerHTML = '';
+    }
+  }
+  if(warnUrlEl){
+    const nu = normalizeUrl(urlVal);
+    if(nu){
+      const matches = papers.filter(p=>p.id!==excludeId && normalizeUrl(p.url)===nu);
+      warnUrlEl.innerHTML = matches.length ? `⚠️ ลิงก์นี้ซ้ำกับ ${matches.length} รายการ: ` + matches.map(m=>`<a href="#" onclick="event.preventDefault();closeModal();openModal('${m.id}')">${escapeHtml(m.title)}</a>`).join(', ') : '';
+    }else{
+      warnUrlEl.innerHTML = '';
+    }
   }
 }
 
@@ -935,7 +986,7 @@ function confirmPassGate(){
   if(cb) cb();
 }
 
-/* ================= DELETE ================= */
+/* ================= DELETE / TRASH ================= */
 const DELETE_PASSCODE = "1234";
 function requestDelete(id, ev){
   if(ev) ev.stopPropagation();
@@ -949,6 +1000,11 @@ function requestDelete(id, ev){
   setTimeout(()=>pass.focus(), 50);
 }
 function requestDeleteFromModal(){
+  if(isAddingNew){
+    // discard unsaved draft, nothing to delete since it was never saved
+    closeModal();
+    return;
+  }
   if(!currentModalPaperId) return;
   requestDelete(currentModalPaperId);
 }
@@ -964,13 +1020,90 @@ async function confirmDelete(){
     document.getElementById('deletePassInput').focus();
     return;
   }
-  const p = papers.find(x=>x.id===deleteTargetId);
-  papers = papers.filter(x=>x.id!==deleteTargetId);
+  const idx = papers.findIndex(x=>x.id===deleteTargetId);
+  if(idx===-1){ closeDeleteConfirm(); return; }
+  const [removed] = papers.splice(idx,1);
   await savePapers();
+  await moveToTrash(removed);
   closeDeleteConfirm();
   if(currentModalPaperId===deleteTargetId){ closeModal(); }
   renderPapers(); renderStats(); renderAnalytics();
-  if(p) sendNotification(`มีการลบงานวิจัยออกจากฐานข้อมูล`, `"${p.title}" ถูกลบโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
+  sendNotification(`มีการย้ายงานวิจัยไปถังขยะ`, `"${removed.title}" ถูกย้ายไปถังขยะโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'} (กู้คืนได้ที่หน้าถังขยะ)`);
+}
+
+/* ---- trash storage / UI ---- */
+async function loadTrash(){
+  try{
+    const r = await window.storage.get('trash-v1', true);
+    trash = JSON.parse(r.value) || [];
+  }catch(e){
+    trash = [];
+  }
+  updateTrashCount();
+}
+async function saveTrash(){
+  try{ await window.storage.set('trash-v1', JSON.stringify(trash), true); }catch(e){}
+  updateTrashCount();
+}
+function updateTrashCount(){
+  const el = document.getElementById('trashCount');
+  if(el) el.textContent = trash.length;
+}
+async function moveToTrash(paper){
+  trash.unshift({
+    paper,
+    deletedAt: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}),
+    deletedBy: role
+  });
+  await saveTrash();
+}
+function openTrash(){
+  renderTrashList();
+  document.getElementById('trashOverlay').classList.add('show');
+}
+function closeTrash(){
+  document.getElementById('trashOverlay').classList.remove('show');
+}
+function renderTrashList(){
+  const body = document.getElementById('trashBody');
+  if(!body) return;
+  if(!trash.length){
+    body.innerHTML = `<div class="trashempty">ถังขยะว่างเปล่า — ยังไม่มีงานวิจัยที่ถูกลบ</div>`;
+    return;
+  }
+  body.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;">มี ${trash.length} รายการในถังขยะ</div>` +
+    trash.map((t,idx)=>`
+      <div class="trashrow">
+        <div class="trinfo">
+          <div class="trtitle">${escapeHtml(t.paper.title)}</div>
+          <div class="trmeta">ลบเมื่อ ${t.deletedAt} · โดย${t.deletedBy==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}${t.paper.country ? ' · '+escapeHtml(t.paper.country) : ''}</div>
+        </div>
+        <div class="tractions">
+          <button class="sbtn" onclick="restoreFromTrash(${idx})">↩ กู้คืน</button>
+          <button class="sbtn" style="border-color:var(--brick);color:var(--brick);" onclick="requestPermanentDelete(${idx})">✕ ลบถาวร</button>
+        </div>
+      </div>
+    `).join('');
+}
+async function restoreFromTrash(idx){
+  const item = trash[idx];
+  if(!item) return;
+  trash.splice(idx,1);
+  papers.push(item.paper);
+  await savePapers();
+  await saveTrash();
+  renderPapers(); renderStats(); renderAnalytics(); renderTrashList();
+  sendNotification('กู้คืนงานวิจัยจากถังขยะ', `"${item.paper.title}" ถูกกู้คืนโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
+}
+function requestPermanentDelete(idx){
+  requestPassGate('ใส่รหัสผ่านเพื่อลบถาวร (กู้คืนไม่ได้อีก)', ()=>permanentlyDeleteFromTrash(idx));
+}
+async function permanentlyDeleteFromTrash(idx){
+  const item = trash[idx];
+  if(!item) return;
+  trash.splice(idx,1);
+  await saveTrash();
+  renderTrashList();
 }
 
 /* ================= STATS (home) ================= */
@@ -1071,18 +1204,25 @@ function exportCSV(){
 /* ================= MODAL ================= */
 function openModal(id){
   currentModalPaperId = id;
-  const p = papers.find(x=>x.id===id);
-  document.getElementById('mTitle').textContent = p.title;
+  const p = (isAddingNew && draftPaper && draftPaper.id===id) ? draftPaper : papers.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('mTitle').textContent = (isAddingNew ? '➕ ' : '') + p.title;
   document.getElementById('mBody').innerHTML = `
     <div class="mfield"><label>ชื่อเรื่องงานวิจัย</label>
       <input id="f-title" value="${escapeAttr(p.title)}" oninput="checkDupLive()" ${role==='advisor'?'disabled':''}>
       <div class="dupwarn" id="dupLiveWarn"></div>
     </div>
-    <div class="mfield"><label>ผู้แต่ง / ปี / แหล่งตีพิมพ์</label>
-      <div style="font-size:13px;color:var(--ink-soft);">${p.authors} — ${p.year} — ${p.venue}</div>
+    <div class="mfield"><label>ผู้แต่ง</label>
+      <input id="f-authors" value="${escapeAttr(p.authors)}" ${role==='advisor'?'disabled':''}>
     </div>
-    <div class="mfield"><label>แหล่งที่มา</label>
-      <div><a class="srclink" href="${p.url}" target="_blank">${p.url} ↗</a></div>
+    <div class="mfield" style="display:flex; gap:10px;">
+      <div style="flex:1;"><label>ปีตีพิมพ์</label><input id="f-year" value="${escapeAttr(p.year)}" ${role==='advisor'?'disabled':''}></div>
+      <div style="flex:2;"><label>แหล่งตีพิมพ์ (Journal/Venue)</label><input id="f-venue" value="${escapeAttr(p.venue)}" ${role==='advisor'?'disabled':''}></div>
+    </div>
+    <div class="mfield"><label>แหล่งที่มา (URL)</label>
+      <input id="f-url" value="${escapeAttr(p.url||'')}" placeholder="https://..." oninput="checkDupLive()" ${role==='advisor'?'disabled':''}>
+      ${p.url ? `<div style="margin-top:6px;"><a class="srclink" href="${p.url}" target="_blank">เปิดลิงก์ ↗</a></div>` : ''}
+      <div class="dupwarn" id="dupLiveWarnUrl"></div>
     </div>
     <div class="mfield"><label>ลิงก์สรุปงานวิจัยของฉัน (Notion / Google Doc ฯลฯ)</label>
       <input id="f-summary" value="${p.mySummaryUrl||''}" placeholder="https://..." ${role==='advisor'?'disabled':''}>
@@ -1118,16 +1258,19 @@ function openModal(id){
       <div class="commentbox">
         <div class="clist" id="clist"></div>
         <div class="caddrow">
-          <textarea id="newComment" placeholder="${role==='advisor'?'เขียนความเห็นถึงนักศึกษา...':'เขียนคำถามหรืออัปเดตถึงอาจารย์...'}"></textarea>
-          <button class="btn" style="padding:9px 14px;" onclick="addComment()">ส่ง</button>
+          <textarea id="newComment" placeholder="${role==='advisor'?'เขียนความเห็นถึงนักศึกษา...':'เขียนคำถามหรืออัปเดตถึงอาจารย์...'}" ${isAddingNew?'disabled':''}></textarea>
+          <button class="btn" style="padding:9px 14px;" onclick="addComment()" ${isAddingNew?'disabled':''}>ส่ง</button>
         </div>
+        ${isAddingNew ? `<div class="dupwarn" style="color:var(--ink-soft);">บันทึกงานวิจัยนี้ก่อน จึงจะเริ่มสนทนาได้</div>` : ''}
       </div>
     </div>
   `;
   document.getElementById('overlay').classList.add('show');
   document.getElementById('statusRow').dataset.picked = p.status;
   document.getElementById('statusRow').dataset.original = p.status;
+  document.getElementById('modalDeleteBtn').textContent = isAddingNew ? '✕ ยกเลิก (ไม่บันทึก)' : '🗑 ลบงานวิจัยนี้';
   renderComments(p);
+  checkDupLive();
 }
 function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
 function pickStatus(s){
@@ -1136,16 +1279,26 @@ function pickStatus(s){
 }
 function closeModal(){
   document.getElementById('overlay').classList.remove('show');
+  if(isAddingNew){
+    // discard unsaved draft entirely — nothing was ever added to papers/storage
+    isAddingNew = false;
+    draftPaper = null;
+  }
   currentModalPaperId = null;
 }
 async function saveModal(){
-  const p = papers.find(x=>x.id===currentModalPaperId);
+  const isNew = isAddingNew;
+  const p = isNew ? draftPaper : papers.find(x=>x.id===currentModalPaperId);
   if(!p) return;
   const statusRow = document.getElementById('statusRow');
   const picked = statusRow.dataset.picked;
   const originalStatus = statusRow.dataset.original;
   const titleEl = document.getElementById('f-title'); if(titleEl && !titleEl.disabled) p.title = titleEl.value.trim() || p.title;
+  const authorsEl = document.getElementById('f-authors'); if(authorsEl && !authorsEl.disabled) p.authors = authorsEl.value.trim();
+  const yearEl = document.getElementById('f-year'); if(yearEl && !yearEl.disabled) p.year = yearEl.value.trim();
+  const venueEl = document.getElementById('f-venue'); if(venueEl && !venueEl.disabled) p.venue = venueEl.value.trim();
   if(picked) p.status = picked;
+  const urlEl = document.getElementById('f-url'); if(urlEl && !urlEl.disabled) p.url = urlEl.value.trim();
   const summary = document.getElementById('f-summary'); if(summary && !summary.disabled) p.mySummaryUrl = summary.value.trim();
   const country = document.getElementById('f-country'); if(country && !country.disabled) p.country = country.value;
   const method = document.getElementById('f-method'); if(method && !method.disabled) p.method = method.value;
@@ -1161,28 +1314,36 @@ async function saveModal(){
   const feedbackEl = document.getElementById('f-feedback');
   const feedbackChanged = feedbackEl && !feedbackEl.disabled && feedbackEl.value !== p.feedback;
   if(feedbackEl && !feedbackEl.disabled) p.feedback = feedbackEl.value;
+
+  if(isNew){
+    papers.push(p);
+    isAddingNew = false;
+    draftPaper = null;
+  }
+
   await savePapers();
   renderPapers(); renderStats(); renderAnalytics();
 
-  // notify: advisor reviewed (status changed) or advisor left feedback
-  if(picked && picked !== originalStatus){
-    sendNotification(`มีการตรวจงานวิจัย: ${p.title}`, `สถานะเปลี่ยนเป็น "${statusLabel(picked)}" โดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
-  }
-  if(role==='advisor' && feedbackChanged && p.feedback.trim()){
-    sendNotification(`Feedback ใหม่จากอาจารย์: ${p.title}`, p.feedback);
+  if(isNew){
+    sendNotification('มีการเพิ่มงานวิจัยใหม่', `"${p.title}" ถูกเพิ่มโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
+  }else{
+    if(picked && picked !== originalStatus){
+      sendNotification(`มีการตรวจงานวิจัย: ${p.title}`, `สถานะเปลี่ยนเป็น "${statusLabel(picked)}" โดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'}`);
+    }
+    if(role==='advisor' && feedbackChanged && p.feedback.trim()){
+      sendNotification(`Feedback ใหม่จากอาจารย์: ${p.title}`, p.feedback);
+    }
   }
 
+  currentModalPaperId = p.id;
   const m = document.getElementById('savedMsg'); m.classList.add('show');
   setTimeout(()=>m.classList.remove('show'), 1400);
 }
 function openAddModal(){
   const id = 'p'+(Date.now());
-  const blank = {id, title:"งานวิจัยใหม่ (แก้ไขชื่อเรื่อง)", authors:"", year:new Date().getFullYear(), venue:"", country:"", url:"https://", level:"entry", tags:[], method:"", status:"unread", feedback:"", notes:"", comments:[], mySummaryUrl:""};
-  papers.push(blank);
-  savePapers().then(()=>{
-    renderPapers(); renderStats(); renderAnalytics(); openModal(id);
-    sendNotification('มีการเพิ่มงานวิจัยใหม่', `เพิ่มรายการใหม่ในฐานข้อมูลโดย${role==='advisor'?'อาจารย์ที่ปรึกษา':'นักศึกษา'} — กรุณาตรวจสอบและกรอกรายละเอียดให้ครบ`);
-  });
+  draftPaper = {id, title:"งานวิจัยใหม่ (แก้ไขชื่อเรื่อง)", authors:"", year:new Date().getFullYear(), venue:"", country:"", url:"", level:"entry", tags:[], method:"", status:"unread", feedback:"", notes:"", comments:[], mySummaryUrl:""};
+  isAddingNew = true;
+  openModal(draftPaper.id);
 }
 
 /* ================= COMMENTS ================= */
@@ -1206,6 +1367,7 @@ function renderComments(p){
   list.scrollTop = list.scrollHeight;
 }
 async function addComment(){
+  if(isAddingNew) return;
   const p = papers.find(x=>x.id===currentModalPaperId);
   if(!p) return;
   const ta = document.getElementById('newComment');
