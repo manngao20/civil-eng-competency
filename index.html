@@ -342,6 +342,15 @@
 .paper-item .pi-title{font-weight:600; font-size:13.5px; margin-bottom:5px; line-height:1.4;}
 .paper-item .pi-meta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-bottom:6px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;}
 .paper-item .pi-summary{font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+  /* ===== GLOBE ===== */
+  .globe-toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .globe-toolbar .gt-note{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-left:auto;}
+  .globe-wrap{display:flex; gap:22px; flex-wrap:wrap; align-items:stretch;}
+  .globe-canvas{flex:1 1 340px; min-width:280px; height:420px; position:relative; background:radial-gradient(circle at 50% 42%, var(--card) 0%, var(--paper) 78%); border:1px solid var(--paper-line); border-radius:4px; overflow:hidden;}
+  .globe-canvas .globe-loading, .globe-canvas .globe-error{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); padding:20px;}
+  .globe-sidebar{width:230px; flex-shrink:0; max-height:420px; overflow:auto; display:flex; flex-direction:column; gap:4px; padding-right:2px;}
+  .globe-sidebar-label{font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin:6px 0 2px;}
+  @media(max-width:820px){ .globe-sidebar{width:100%; max-height:220px;} }
   /* duplicate check + notif log */
   .dupwarn{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brick); margin-top:6px; line-height:1.6;}
   .dupwarn a{color:var(--brick); text-decoration:underline;}
@@ -572,12 +581,29 @@
       <h2>Research Analytics</h2>
       <div class="note">สรุปภาพรวมฐานข้อมูลงานวิจัยแบบเรียลไทม์</div>
     </div>
+
     <div class="analytics-toolbar">
       <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em;">รูปแบบกราฟ:</span>
       <button type="button" class="btn ghost ctbtn active" data-t="bar" onclick="setChartType('bar')">▭ แท่ง (Bar)</button>
       <button type="button" class="btn ghost ctbtn" data-t="pie" onclick="setChartType('pie')">◐ วงกลม (Pie)</button>
-      <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-left:auto;">💡 คลิกที่แท่ง/ชิ้นกราฟ เพื่อดูรายชื่องานวิจัยในกลุ่มนั้น</span>
+      <button type="button" class="btn ghost" id="globeToggleBtn" style="margin-left:auto;" onclick="toggleGlobe()">🌐 แผนที่โลก</button>
     </div>
+
+    <!-- ===== Globe (country map) — hidden until requested from the toolbar above ===== -->
+    <div class="chartblock full" id="globeBlock" style="margin-bottom:20px; display:none;">
+      <div class="globe-toolbar">
+        <h3 style="margin:0;">แผนที่โลก: งานวิจัยตามประเทศ</h3>
+        <span class="gt-note">คลิกประเทศบนลูกโลก หรือเลือกจากรายการด้านขวา</span>
+      </div>
+      <div class="globe-wrap">
+        <div class="globe-canvas" id="globeCanvas">
+          <div class="globe-loading" id="globeLoading">กำลังโหลดแผนที่โลก…</div>
+        </div>
+        <div class="globe-sidebar" id="globeSidebar"></div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin:-6px 0 16px;">💡 คลิกที่แท่ง/ชิ้นกราฟ เพื่อดูรายชื่องานวิจัยในกลุ่มนั้น</div>
     <div class="analytics-grid">
       <div class="chartblock">
         <h3>สถานะการตรวจ</h3>
@@ -591,13 +617,9 @@
         <h3>จำนวนงานวิจัยตาม Competency</h3>
         <div id="chartTags"></div>
       </div>
-      <div class="chartblock">
+      <div class="chartblock full">
         <h3>ตามปีตีพิมพ์</h3>
         <div id="chartYears"></div>
-      </div>
-      <div class="chartblock">
-        <h3>ตามประเทศ/ภูมิภาค</h3>
-        <div id="chartCountries"></div>
       </div>
     </div>
 
@@ -734,6 +756,8 @@
 
 <!-- Storage shim: makes window.storage work on a plain static host (see storage-shim.js) -->
 <script src="storage-shim.js"></script>
+<!-- Globe.gl (wraps three.js) — used for the country-clickable minimal globe on the Analytics page -->
+<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.41.6/dist/globe.gl.min.js"></script>
 
 <script>
 /* ================= DATA ================= */
@@ -1610,6 +1634,25 @@ function setChartType(t){
   renderAnalytics(true);
 }
 
+/* ================= GLOBE TOGGLE ================= */
+let globeShown = false;
+function toggleGlobe(){
+  globeShown = !globeShown;
+  const block = document.getElementById('globeBlock');
+  const btn = document.getElementById('globeToggleBtn');
+  if(globeShown){
+    block.style.display = 'block';
+    btn.classList.add('active');
+    btn.textContent = '🌐 ซ่อนแผนที่โลก';
+    initGlobe();
+    block.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }else{
+    block.style.display = 'none';
+    btn.classList.remove('active');
+    btn.textContent = '🌐 แผนที่โลก';
+  }
+}
+
 /* Unified chart renderer: config = {labelMap, colorMap, fallbackColor, sortByKey, matchField} */
 function renderChart(elId, dataObj, config){
   config = config || {};
@@ -1750,12 +1793,177 @@ function renderAnalytics(keepDrilldown){
   const yearCounts = {};
   papers.forEach(p=>{ yearCounts[p.year]=(yearCounts[p.year]||0)+1; });
   renderChart('chartYears', yearCounts, { sortByKey:true, matchField:'year' });
-  const countryCounts = countBy(papers,'country');
-  renderChart('chartCountries', countryCounts, { matchField:'country' });
   if(!keepDrilldown){
     const block = document.getElementById('drilldownBlock');
     if(block) block.style.display = 'none';
   }
+  if(globeShown){ updateGlobeData(); }
+}
+
+/* ================= GLOBE (country map, minimal white style) ================= */
+/* Maps free-text `country` field on papers -> globe admin name. Countries not
+   recognised (e.g. "Global (systematic review)") are grouped under "อื่นๆ / หลายประเทศ"
+   in the sidebar and are still clickable for drilldown, just not shown on the sphere. */
+const COUNTRY_ALIASES = {
+  "USA": "United States of America",
+  "USA (global standard)": "United States of America",
+  "UK": "United Kingdom",
+  "Thailand": "Thailand",
+  "Bhutan": "Bhutan",
+  "Philippines": "Philippines",
+  "India": "India",
+  "Indonesia": "Indonesia",
+  "Malaysia": "Malaysia",
+  "Peru": "Peru",
+  "Vietnam / mixed": "Vietnam",
+};
+const GEOJSON_URL = "https://cdn.jsdelivr.net/gh/vasturiano/globe.gl@master/example/datasets/ne_110m_admin_0_countries.geojson";
+let worldGeo = null;
+let globeInstance = null;
+let globeLoadFailed = false;
+let globeInitTries = 0;
+
+function getCountryCounts(){
+  const counts = {};
+  papers.forEach(p=>{
+    const n = COUNTRY_ALIASES[p.country];
+    if(n) counts[n] = (counts[n]||0)+1;
+  });
+  return counts;
+}
+function getOtherCountryGroups(){
+  const groups = {};
+  papers.forEach(p=>{
+    if(!COUNTRY_ALIASES[p.country]) groups[p.country] = (groups[p.country]||0)+1;
+  });
+  return groups;
+}
+function countColor(c, max){
+  // pale blue (--blue-pale) -> deep blue (--blue-deep), matches site palette
+  const t = Math.min(1, c/max);
+  const r1=221,g1=231,b1=238, r2=31,g2=66,b2=92;
+  const r = Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), b=Math.round(b1+(b2-b1)*t);
+  return `rgb(${r},${g},${b})`;
+}
+function centroidOf(feature){
+  let coords = [];
+  const geom = feature.geometry;
+  function collect(c, depth){ if(depth===0){ coords.push(c); return; } c.forEach(cc=>collect(cc, depth-1)); }
+  if(geom.type==='Polygon') collect(geom.coordinates, 2);
+  else if(geom.type==='MultiPolygon') collect(geom.coordinates, 3);
+  if(!coords.length) return [0,0];
+  const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+  return [(Math.min(...lons)+Math.max(...lons))/2, (Math.min(...lats)+Math.max(...lats))/2];
+}
+async function initGlobe(){
+  const container = document.getElementById('globeCanvas');
+  if(!container || globeInstance || globeLoadFailed) return;
+  if(typeof Globe === 'undefined'){
+    // the CDN <script> tag may simply still be downloading/executing — retry briefly before giving up
+    if(globeInitTries < 10){
+      globeInitTries++;
+      setTimeout(initGlobe, 300);
+      return;
+    }
+    globeLoadFailed = true;
+    container.innerHTML = `<div class="globe-error">ไม่สามารถโหลดไลบรารีลูกโลกได้ (ต้องเชื่อมต่ออินเทอร์เน็ต)<br><span style="text-decoration:underline;cursor:pointer;" onclick="globeLoadFailed=false;globeInitTries=0;initGlobe();">ลองใหม่ ↻</span></div>`;
+    renderGlobeSidebarOnly();
+    return;
+  }
+  try{
+    const res = await fetch(GEOJSON_URL);
+    worldGeo = await res.json();
+  }catch(e){
+    globeLoadFailed = true;
+    container.innerHTML = `<div class="globe-error">โหลดข้อมูลแผนที่ไม่สำเร็จ (ต้องเชื่อมต่ออินเทอร์เน็ต)<br><span style="text-decoration:underline;cursor:pointer;" onclick="globeLoadFailed=false;globeInitTries=0;initGlobe();">ลองใหม่ ↻</span></div>`;
+    renderGlobeSidebarOnly();
+    return;
+  }
+  container.innerHTML = '';
+  const counts = getCountryCounts();
+  const maxCount = Math.max(1, ...Object.values(counts));
+  globeInstance = Globe()(container)
+    .width(container.clientWidth)
+    .height(420)
+    .backgroundColor('rgba(0,0,0,0)')
+    .showAtmosphere(true)
+    .atmosphereColor('#DDE7EE')
+    .atmosphereAltitude(0.18)
+    .polygonsData(worldGeo.features)
+    .polygonCapColor(f=>{
+      const n = f.properties.ADMIN || f.properties.name;
+      const c = counts[n]||0;
+      return c ? countColor(c, maxCount) : '#EDEAE0';
+    })
+    .polygonSideColor(()=> 'rgba(24,40,51,0.05)')
+    .polygonStrokeColor(()=> '#182833')
+    .polygonAltitude(f=>{
+      const n = f.properties.ADMIN || f.properties.name;
+      const c = counts[n]||0;
+      return c ? 0.01 + (c/maxCount)*0.06 : 0.006;
+    })
+    .polygonLabel(f=>{
+      const n = f.properties.ADMIN || f.properties.name;
+      const c = counts[n]||0;
+      return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#FBFAF6;color:#182833;padding:6px 9px;border:1px solid #182833;border-radius:2px;">${n}: ${c} งานวิจัย</div>`;
+    })
+    .onPolygonClick(f=> focusCountry(f.properties.ADMIN || f.properties.name))
+    .polygonsTransitionDuration(300);
+  const scene = globeInstance.scene && globeInstance.scene();
+  if(scene){ scene.background = null; }
+  const material = globeInstance.globeMaterial && globeInstance.globeMaterial();
+  if(material){ material.color = new (window.THREE ? window.THREE.Color : Object)('#FBFAF6'); material.opacity = 1; }
+  globeInstance.pointOfView({lat:15, lng:35, altitude:2.3}, 0);
+  const controls = globeInstance.controls();
+  controls.autoRotate = true; controls.autoRotateSpeed = 0.4; controls.enableZoom = true;
+  container.addEventListener('pointerdown', ()=>{ controls.autoRotate = false; }, {once:true});
+  window.addEventListener('resize', ()=>{ if(globeInstance) globeInstance.width(container.clientWidth); });
+  renderGlobeSidebar(counts);
+}
+function focusCountry(adminName){
+  if(worldGeo && globeInstance){
+    const feat = worldGeo.features.find(f=> (f.properties.ADMIN||f.properties.name)===adminName);
+    if(feat){
+      const c = centroidOf(feat);
+      globeInstance.controls().autoRotate = false;
+      globeInstance.pointOfView({lat:c[1], lng:c[0], altitude:1.4}, 1000);
+    }
+  }
+  const matches = papers.filter(p=> COUNTRY_ALIASES[p.country]===adminName);
+  renderDrilldown(adminName, matches);
+}
+function renderGlobeSidebar(counts){
+  const el = document.getElementById('globeSidebar');
+  if(!el) return;
+  const mapped = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const other = Object.entries(getOtherCountryGroups()).sort((a,b)=>b[1]-a[1]);
+  const maxCount = Math.max(1, ...mapped.map(m=>m[1]));
+  let html = mapped.map(([n,c])=>`<div class="legend-item" onclick="focusCountry('${escapeAttr(n)}')"><span class="legend-swatch" style="background:${countColor(c,maxCount)}"></span>${escapeHtml(n)}<span class="lv">${c}</span></div>`).join('');
+  if(other.length){
+    html += `<div class="globe-sidebar-label">อื่นๆ / หลายประเทศ</div>`;
+    html += other.map(([n,c])=>`<div class="legend-item" onclick="drilldown('country','${escapeAttr(n)}','${escapeAttr(n)}')"><span class="legend-swatch" style="background:#B9812E"></span>${escapeHtml(n)}<span class="lv">${c}</span></div>`).join('');
+  }
+  el.innerHTML = html || `<div class="chartblock empty-note">ไม่มีข้อมูล</div>`;
+}
+function renderGlobeSidebarOnly(){
+  // fallback list-only view if the 3D globe couldn't load
+  renderGlobeSidebar(getCountryCounts());
+}
+function updateGlobeData(){
+  const counts = getCountryCounts();
+  if(globeInstance && worldGeo){
+    const maxCount = Math.max(1, ...Object.values(counts));
+    globeInstance.polygonCapColor(f=>{
+      const n = f.properties.ADMIN || f.properties.name;
+      const c = counts[n]||0;
+      return c ? countColor(c, maxCount) : '#EDEAE0';
+    }).polygonAltitude(f=>{
+      const n = f.properties.ADMIN || f.properties.name;
+      const c = counts[n]||0;
+      return c ? 0.01 + (c/maxCount)*0.06 : 0.006;
+    });
+  }
+  renderGlobeSidebar(counts);
 }
 
 /* ================= INIT ================= */
