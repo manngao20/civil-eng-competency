@@ -421,29 +421,7 @@
 </head>
 <body>
 
-<!-- ===== Login screen ===== -->
-<div class="overlay show" id="loginOverlay" style="align-items:center;">
-  <div class="login-card">
-    <div class="mhead"><h3>เข้าสู่ระบบ</h3></div>
-    <div class="mbody">
-      <div class="login-eyebrow">Civil Engineering Competency Research<br>กรุณาเข้าสู่ระบบเพื่อใช้งานฐานข้อมูลงานวิจัย</div>
-      <div class="mfield">
-        <label>ชื่อผู้ใช้</label>
-        <input type="text" id="loginUser" placeholder="username" autocomplete="username" onkeydown="if(event.key==='Enter'){document.getElementById('loginPass').focus();}">
-      </div>
-      <div class="mfield">
-        <label>รหัสผ่าน</label>
-        <input type="password" id="loginPass" placeholder="รหัสผ่าน" autocomplete="current-password" onkeydown="if(event.key==='Enter'){doLogin();}">
-      </div>
-      <div class="dupwarn" id="loginError" style="display:none;">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
-    </div>
-    <div class="mfoot" style="justify-content:flex-end;">
-      <button class="btn" onclick="doLogin()">เข้าสู่ระบบ</button>
-    </div>
-  </div>
-</div>
-
-<div id="appRoot" style="display:none;">
+<div id="appRoot">
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brandmark" onclick="goPage('home')">
@@ -467,14 +445,6 @@
           <button class="btn" style="padding:6px 10px; font-size:10.5px;" onclick="saveSummaryLink()">บันทึก</button>
         </div>
       </div>
-    </div>
-    <div class="userbox" id="userBox">
-      <div class="userbadge">
-        <span class="ub-name" id="userNameDisplay"></span>
-        <span class="ub-role" id="userRoleDisplay"></span>
-      </div>
-      <button class="btn ghost" id="manageUsersBtn" style="display:none; padding:8px 12px; font-size:11px;" onclick="openUserMgmt()">👥 ผู้ใช้งาน</button>
-      <button class="btn ghost" style="padding:8px 12px; font-size:11px;" onclick="logout()">ออกจากระบบ</button>
     </div>
   </div>
 </header>
@@ -677,13 +647,13 @@
     </div>
 
     <div style="text-align:right; margin-top:18px;">
-      <span onclick="requestPassGate('ใส่รหัสผ่านเพื่อดูประวัติการทำรายการ', ()=>openActivityLog())" style="cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); text-decoration:underline; opacity:.6;" title="ประวัติการทำรายการ">⋯ ประวัติการทำรายการ</span>
+      <span onclick="openActivityLog()" style="cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); text-decoration:underline; opacity:.6;" title="ประวัติการทำรายการ">⋯ ประวัติการทำรายการ</span>
     </div>
   </section>
 
 </main>
 
-<footer>PROTOTYPE WEBSITE · DATA ENTERED HERE IS SHARED BETWEEN STUDENT &amp; ADVISOR · GENERATED FOR SENIOR PROJECT USE</footer>
+<footer>PROTOTYPE WEBSITE · GENERATED FOR SENIOR PROJECT USE</footer>
 
 </div><!-- /appRoot -->
 
@@ -736,7 +706,7 @@
   </div>
 </div>
 
-<!-- ===== Activity log overlay (password protected) ===== -->
+<!-- ===== Activity log overlay ===== -->
 <div class="overlay" id="activityLogOverlay">
   <div class="modal">
     <div class="mhead">
@@ -761,11 +731,6 @@
     <div class="mbody">
       คุณต้องการย้ายงานวิจัยนี้ไปถังขยะใช่หรือไม่? สามารถกู้คืนได้ภายหลังจากหน้าถังขยะ
       <b id="deleteTargetTitle"></b>
-      <div class="mfield" style="margin-top:14px;">
-        <label>ใส่รหัสผ่านเพื่อยืนยัน</label>
-        <input type="password" id="deletePassInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter'){confirmDelete();}">
-        <div class="dupwarn" id="deletePassError" style="display:none;">รหัสผ่านไม่ถูกต้อง</div>
-      </div>
     </div>
     <div class="mfoot">
       <span></span>
@@ -773,45 +738,6 @@
         <button class="btn ghost" onclick="closeDeleteConfirm()">ยกเลิก</button>
         <button class="btn danger" onclick="confirmDelete()">ย้ายไปถังขยะ</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== Password gate overlay (reused for protected actions) ===== -->
-<div class="overlay" id="passGateOverlay">
-  <div class="confirm-modal">
-    <div class="mhead">
-      <h3 id="passGateTitle">ยืนยันรหัสผ่าน</h3>
-      <button class="mclose" onclick="closePassGate()">✕</button>
-    </div>
-    <div class="mbody">
-      <div class="mfield">
-        <label>ใส่รหัสผ่านเพื่อดำเนินการต่อ</label>
-        <input type="password" id="passGateInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter'){confirmPassGate();}">
-        <div class="dupwarn" id="passGateError" style="display:none;">รหัสผ่านไม่ถูกต้อง</div>
-      </div>
-    </div>
-    <div class="mfoot">
-      <span></span>
-      <div style="display:flex; gap:8px;">
-        <button class="btn ghost" onclick="closePassGate()">ยกเลิก</button>
-        <button class="btn" onclick="confirmPassGate()">ยืนยัน</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== User management overlay (admin only) ===== -->
-<div class="overlay" id="userMgmtOverlay">
-  <div class="modal">
-    <div class="mhead">
-      <h3>จัดการผู้ใช้งาน</h3>
-      <button class="mclose" onclick="closeUserMgmt()">✕</button>
-    </div>
-    <div class="mbody" id="userMgmtBody"></div>
-    <div class="mfoot">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);">ระบบนี้เก็บรหัสผ่านแบบข้อความธรรมดา เหมาะสำหรับกลุ่มผู้ใช้ที่ไว้ใจกันเท่านั้น</span>
-      <button class="btn ghost" onclick="closeUserMgmt()">ปิด</button>
     </div>
   </div>
 </div>
@@ -896,174 +822,8 @@ let siteConfig = {
   year:"2026", rev:"00",
   summaryUrl:""
 };
-let role = "student";
-let currentUser = null;
-let users = [];
-let editingUsername = null;
 let currentModalPaperId = null;
 let deleteTargetId = null;
-
-const DEFAULT_ADMIN = {username:'manngao11', password:'170248', role:'admin', name:'Admin'};
-function roleLabel(r){ return {admin:'ผู้ดูแลระบบ', advisor:'อาจารย์ที่ปรึกษา', student:'นักศึกษา'}[r] || r; }
-
-/* ================= AUTH ================= */
-async function loadUsers(){
-  try{
-    const r = await window.storage.get('users-v1', true);
-    const loaded = JSON.parse(r.value) || [];
-    if(!loaded.length) throw new Error('empty');
-    users = loaded;
-  }catch(e){
-    users = [DEFAULT_ADMIN];
-    try{ await window.storage.set('users-v1', JSON.stringify(users), true); }catch(e2){}
-  }
-}
-async function saveUsers(){
-  try{ await window.storage.set('users-v1', JSON.stringify(users), true); }catch(e){}
-}
-async function initAuth(){
-  await loadUsers();
-  let sessionUser = null;
-  try{
-    const r = await window.storage.get('session-v1', false);
-    sessionUser = JSON.parse(r.value);
-  }catch(e){}
-  if(sessionUser && users.find(u=>u.username===sessionUser)){
-    enterApp(sessionUser);
-  }else{
-    const el = document.getElementById('loginUser');
-    if(el) el.focus();
-  }
-}
-async function doLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const found = users.find(x=>x.username===u && x.password===p);
-  const errEl = document.getElementById('loginError');
-  if(!found){
-    errEl.style.display = 'block';
-    return;
-  }
-  errEl.style.display = 'none';
-  try{ await window.storage.set('session-v1', JSON.stringify(found.username), false); }catch(e){}
-  enterApp(found.username);
-}
-function enterApp(username){
-  const u = users.find(x=>x.username===username);
-  if(!u) return;
-  currentUser = u;
-  role = u.role;
-  document.getElementById('loginOverlay').classList.remove('show');
-  document.getElementById('appRoot').style.display = '';
-  document.getElementById('userNameDisplay').textContent = u.name || u.username;
-  document.getElementById('userRoleDisplay').textContent = roleLabel(u.role);
-  document.getElementById('manageUsersBtn').style.display = (u.role==='admin') ? 'inline-flex' : 'none';
-  loadAll();
-}
-async function logout(){
-  try{ await window.storage.set('session-v1', JSON.stringify(null), false); }catch(e){}
-  location.reload();
-}
-
-/* ================= USER MANAGEMENT (admin only) ================= */
-function renderUserMgmt(){
-  const body = document.getElementById('userMgmtBody');
-  const rows = users.map(u=>`
-    <div class="usermgmt-row">
-      <div>
-        <div class="umname">${escapeHtml(u.name||u.username)} <span class="notifbadge">${roleLabel(u.role)}</span></div>
-        <div class="umuser">username: ${escapeHtml(u.username)}</div>
-      </div>
-      <div style="display:flex; gap:6px;">
-        <button class="sbtn" onclick="editUser('${escapeAttr(u.username)}')">แก้ไข</button>
-        ${u.username!==currentUser.username ? `<button class="sbtn" style="border-color:var(--brick);color:var(--brick);" onclick="deleteUser('${escapeAttr(u.username)}')">ลบ</button>` : ''}
-      </div>
-    </div>
-  `).join('');
-  const isEditing = !!editingUsername;
-  body.innerHTML = `
-    <div style="margin-bottom:18px;">${rows}</div>
-    <div class="mfield"><label id="userFormLabel">${isEditing ? 'แก้ไขผู้ใช้: '+escapeHtml(editingUsername) : 'เพิ่มผู้ใช้ใหม่'}</label></div>
-    <div class="mfield"><label>ชื่อผู้ใช้ (username)</label><input id="uf-username" placeholder="เช่น somchai01" ${isEditing?'disabled':''}></div>
-    <div class="mfield"><label>ชื่อที่แสดง</label><input id="uf-name" placeholder="เช่น อ.สมชาย"></div>
-    <div class="mfield"><label>รหัสผ่าน</label><input id="uf-password" placeholder="ตั้งรหัสผ่าน"></div>
-    <div class="mfield"><label>บทบาท</label>
-      <select id="uf-role">
-        <option value="student">นักศึกษา (แก้ไขข้อมูลงานวิจัย)</option>
-        <option value="advisor">อาจารย์ที่ปรึกษา (ตรวจ / feedback)</option>
-        <option value="admin">ผู้ดูแลระบบ (แก้ไขได้ทุกอย่าง + จัดการผู้ใช้)</option>
-      </select>
-    </div>
-    <div class="dupwarn" id="uf-msg" style="display:none;"></div>
-    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
-      ${isEditing ? `<button class="btn ghost" style="padding:9px 14px;" onclick="resetUserForm()">ยกเลิกแก้ไข</button>` : ''}
-      <button class="btn" style="padding:9px 14px;" onclick="saveUser()">บันทึกผู้ใช้</button>
-    </div>
-  `;
-  if(isEditing){
-    const u = users.find(x=>x.username===editingUsername);
-    if(u){
-      document.getElementById('uf-username').value = u.username;
-      document.getElementById('uf-name').value = u.name||'';
-      document.getElementById('uf-password').value = u.password;
-      document.getElementById('uf-role').value = u.role;
-    }
-  }
-}
-function openUserMgmt(){
-  editingUsername = null;
-  renderUserMgmt();
-  document.getElementById('userMgmtOverlay').classList.add('show');
-}
-function closeUserMgmt(){
-  document.getElementById('userMgmtOverlay').classList.remove('show');
-}
-function editUser(username){
-  editingUsername = username;
-  renderUserMgmt();
-}
-function resetUserForm(){
-  editingUsername = null;
-  renderUserMgmt();
-}
-function userFormMsg(text){
-  const el = document.getElementById('uf-msg');
-  if(!el) return;
-  el.textContent = text;
-  el.style.display = 'block';
-}
-async function saveUser(){
-  const username = document.getElementById('uf-username').value.trim();
-  const name = document.getElementById('uf-name').value.trim();
-  const password = document.getElementById('uf-password').value;
-  const roleVal = document.getElementById('uf-role').value;
-  if(!username || !password){ userFormMsg('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน'); return; }
-  if(editingUsername){
-    const u = users.find(x=>x.username===editingUsername);
-    if(u){ u.name = name; u.password = password; u.role = roleVal; }
-    if(editingUsername===currentUser.username){
-      currentUser = u; role = u.role;
-      document.getElementById('userNameDisplay').textContent = u.name || u.username;
-      document.getElementById('userRoleDisplay').textContent = roleLabel(u.role);
-      document.getElementById('manageUsersBtn').style.display = (u.role==='admin') ? 'inline-flex' : 'none';
-    }
-  }else{
-    if(users.find(x=>x.username===username)){ userFormMsg('มีชื่อผู้ใช้นี้อยู่แล้ว'); return; }
-    users.push({username, name, password, role:roleVal});
-  }
-  await saveUsers();
-  editingUsername = null;
-  renderUserMgmt();
-}
-async function deleteUser(username){
-  if(username===currentUser.username) return;
-  const target = users.find(u=>u.username===username);
-  const admins = users.filter(u=>u.role==='admin');
-  if(target && target.role==='admin' && admins.length<=1){ userFormMsg('ต้องมีผู้ดูแลระบบอย่างน้อย 1 คน'); return; }
-  users = users.filter(x=>x.username!==username);
-  await saveUsers();
-  renderUserMgmt();
-}
 
 /* ================= STORAGE ================= */
 async function loadAll(){
@@ -1135,7 +895,7 @@ function applySummaryLink(){
 function handleSummaryClick(e){
   if(!siteConfig.summaryUrl){
     e.preventDefault();
-    requestPassGate('ใส่รหัสผ่านเพื่อตั้งลิงก์ภาพรวมงานวิจัย', ()=>openSummaryPop());
+    openSummaryPop();
     return false;
   }
   return true;
@@ -1145,7 +905,7 @@ function toggleSummaryPop(){
   if(pop.classList.contains('show')){
     closeSummaryPop();
   }else{
-    requestPassGate('ใส่รหัสผ่านเพื่อแก้ไขลิงก์', ()=>openSummaryPop());
+    openSummaryPop();
   }
 }
 function openSummaryPop(){
@@ -1171,13 +931,6 @@ document.addEventListener('click', (e)=>{
 
 let tbEditing = false;
 function toggleTitleblockEdit(){
-  if(!tbEditing){
-    requestPassGate('ใส่รหัสผ่านเพื่อแก้ไข Title Block', ()=>doToggleTitleblockEdit());
-    return;
-  }
-  doToggleTitleblockEdit();
-}
-function doToggleTitleblockEdit(){
   tbEditing = !tbEditing;
   document.querySelectorAll('.titleblock input.editable').forEach(inp=>{ inp.readOnly = !tbEditing; });
   document.getElementById('titleblock').classList.toggle('editing', tbEditing);
@@ -1252,7 +1005,7 @@ function renderGoals(){
   }).join('');
 }
 
-/* ================= ACTIVITY LOG (internal record, no email — password protected) ================= */
+/* ================= ACTIVITY LOG (internal record, no email) ================= */
 async function sendNotification(subject, message){
   const entry = {subject, message, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})};
   try{
@@ -1264,8 +1017,7 @@ async function sendNotification(subject, message){
     await window.storage.set(key, JSON.stringify(log), true);
   }catch(e){}
 }
-function openActivityLog(
-){
+function openActivityLog(){
   renderActivityLog();
   document.getElementById('activityLogOverlay').classList.add('show');
 }
@@ -1374,45 +1126,14 @@ function checkDupLive(){
   }
 }
 
-/* ================= PASSWORD GATE (reused for editing link / title block) ================= */
-const EDIT_PASSCODE = "1234";
-let passGateCallback = null;
-function requestPassGate(title, callback){
-  passGateCallback = callback;
-  document.getElementById('passGateTitle').textContent = title || 'ยืนยันรหัสผ่าน';
-  const inp = document.getElementById('passGateInput'); inp.value = '';
-  document.getElementById('passGateError').style.display = 'none';
-  document.getElementById('passGateOverlay').classList.add('show');
-  setTimeout(()=>inp.focus(), 50);
-}
-function closePassGate(){
-  passGateCallback = null;
-  document.getElementById('passGateOverlay').classList.remove('show');
-}
-function confirmPassGate(){
-  const val = (document.getElementById('passGateInput').value || '').trim();
-  if(val !== EDIT_PASSCODE){
-    document.getElementById('passGateError').style.display = 'block';
-    document.getElementById('passGateInput').focus();
-    return;
-  }
-  const cb = passGateCallback;
-  closePassGate();
-  if(cb) cb();
-}
-
 /* ================= DELETE / TRASH ================= */
-const DELETE_PASSCODE = "1234";
 function requestDelete(id, ev){
   if(ev) ev.stopPropagation();
   const p = papers.find(x=>x.id===id);
   if(!p) return;
   deleteTargetId = id;
   document.getElementById('deleteTargetTitle').textContent = p.title;
-  const pass = document.getElementById('deletePassInput'); pass.value=''; 
-  document.getElementById('deletePassError').style.display='none';
   document.getElementById('deleteOverlay').classList.add('show');
-  setTimeout(()=>pass.focus(), 50);
 }
 function requestDeleteFromModal(){
   if(isAddingNew){
@@ -1429,12 +1150,6 @@ function closeDeleteConfirm(){
 }
 async function confirmDelete(){
   if(!deleteTargetId) return;
-  const passVal = (document.getElementById('deletePassInput').value || '').trim();
-  if(passVal !== DELETE_PASSCODE){
-    document.getElementById('deletePassError').style.display='block';
-    document.getElementById('deletePassInput').focus();
-    return;
-  }
   const idx = papers.findIndex(x=>x.id===deleteTargetId);
   if(idx===-1){ closeDeleteConfirm(); return; }
   const [removed] = papers.splice(idx,1);
@@ -1443,7 +1158,7 @@ async function confirmDelete(){
   closeDeleteConfirm();
   if(currentModalPaperId===deleteTargetId){ closeModal(); }
   renderPapers(); renderStats(); renderGoals(); renderAnalytics();
-  sendNotification(`มีการย้ายงานวิจัยไปถังขยะ`, `"${removed.title}" ถูกย้ายไปถังขยะโดย${roleLabel(role)} (กู้คืนได้ที่หน้าถังขยะ)`);
+  sendNotification(`มีการย้ายงานวิจัยไปถังขยะ`, `"${removed.title}" ถูกย้ายไปถังขยะ (กู้คืนได้ที่หน้าถังขยะ)`);
 }
 
 /* ---- trash storage / UI ---- */
@@ -1467,8 +1182,7 @@ function updateTrashCount(){
 async function moveToTrash(paper){
   trash.unshift({
     paper,
-    deletedAt: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}),
-    deletedBy: role
+    deletedAt: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})
   });
   await saveTrash();
 }
@@ -1491,11 +1205,11 @@ function renderTrashList(){
       <div class="trashrow">
         <div class="trinfo">
           <div class="trtitle">${escapeHtml(t.paper.title)}</div>
-          <div class="trmeta">ลบเมื่อ ${t.deletedAt} · โดย${roleLabel(t.deletedBy)}${t.paper.country ? ' · '+escapeHtml(t.paper.country) : ''}</div>
+          <div class="trmeta">ลบเมื่อ ${t.deletedAt}${t.paper.country ? ' · '+escapeHtml(t.paper.country) : ''}</div>
         </div>
         <div class="tractions">
           <button class="sbtn" onclick="restoreFromTrash(${idx})">↩ กู้คืน</button>
-          <button class="sbtn" style="border-color:var(--brick);color:var(--brick);" onclick="requestPermanentDelete(${idx})">✕ ลบถาวร</button>
+          <button class="sbtn" style="border-color:var(--brick);color:var(--brick);" onclick="permanentlyDeleteFromTrash(${idx})">✕ ลบถาวร</button>
         </div>
       </div>
     `).join('');
@@ -1508,10 +1222,7 @@ async function restoreFromTrash(idx){
   await savePapers();
   await saveTrash();
   renderPapers(); renderStats(); renderGoals(); renderAnalytics(); renderTrashList();
-  sendNotification('กู้คืนงานวิจัยจากถังขยะ', `"${item.paper.title}" ถูกกู้คืนโดย${roleLabel(role)}`);
-}
-function requestPermanentDelete(idx){
-  requestPassGate('ใส่รหัสผ่านเพื่อลบถาวร (กู้คืนไม่ได้อีก)', ()=>permanentlyDeleteFromTrash(idx));
+  sendNotification('กู้คืนงานวิจัยจากถังขยะ', `"${item.paper.title}" ถูกกู้คืน`);
 }
 async function permanentlyDeleteFromTrash(idx){
   const item = trash[idx];
@@ -1644,35 +1355,35 @@ function openModal(id){
   document.getElementById('mTitle').textContent = (isAddingNew ? '➕ ' : '') + p.title;
   document.getElementById('mBody').innerHTML = `
     <div class="mfield"><label>ชื่อเรื่องงานวิจัย</label>
-      <input id="f-title" value="${escapeAttr(p.title)}" oninput="checkDupLive()" ${role==='advisor'?'disabled':''}>
+      <input id="f-title" value="${escapeAttr(p.title)}" oninput="checkDupLive()">
       <div class="dupwarn" id="dupLiveWarn"></div>
     </div>
     <div class="mfield"><label>ผู้แต่ง</label>
-      <input id="f-authors" value="${escapeAttr(p.authors)}" ${role==='advisor'?'disabled':''}>
+      <input id="f-authors" value="${escapeAttr(p.authors)}">
     </div>
     <div class="mfield" style="display:flex; gap:10px;">
-      <div style="flex:1;"><label>ปีตีพิมพ์</label><input id="f-year" value="${escapeAttr(p.year)}" ${role==='advisor'?'disabled':''}></div>
-      <div style="flex:2;"><label>แหล่งตีพิมพ์ (Journal/Venue)</label><input id="f-venue" value="${escapeAttr(p.venue)}" ${role==='advisor'?'disabled':''}></div>
+      <div style="flex:1;"><label>ปีตีพิมพ์</label><input id="f-year" value="${escapeAttr(p.year)}"></div>
+      <div style="flex:2;"><label>แหล่งตีพิมพ์ (Journal/Venue)</label><input id="f-venue" value="${escapeAttr(p.venue)}"></div>
     </div>
     <div class="mfield"><label>แหล่งที่มา (URL)</label>
-      <input id="f-url" value="${escapeAttr(p.url||'')}" placeholder="https://..." oninput="checkDupLive()" ${role==='advisor'?'disabled':''}>
+      <input id="f-url" value="${escapeAttr(p.url||'')}" placeholder="https://..." oninput="checkDupLive()">
       ${p.url ? `<div style="margin-top:6px;"><a class="srclink" href="${p.url}" target="_blank">เปิดลิงก์ ↗</a></div>` : ''}
       <div class="dupwarn" id="dupLiveWarnUrl"></div>
     </div>
     <div class="mfield"><label>ลิงก์สรุปงานวิจัยของฉัน (Notion / Google Doc ฯลฯ)</label>
-      <input id="f-summary" value="${p.mySummaryUrl||''}" placeholder="https://..." ${role==='advisor'?'disabled':''}>
+      <input id="f-summary" value="${p.mySummaryUrl||''}" placeholder="https://...">
       ${p.mySummaryUrl ? `<div style="margin-top:6px;"><a class="srclink" href="${p.mySummaryUrl}" target="_blank">เปิดดูสรุป ↗</a></div>` : ''}
     </div>
-    <div class="mfield"><label>ประเทศ / ภูมิภาค</label><input id="f-country" value="${p.country}" ${role==='advisor'?'disabled':''}></div>
+    <div class="mfield"><label>ประเทศ / ภูมิภาค</label><input id="f-country" value="${p.country}"></div>
     <div class="mfield"><label>ลักษณะการทำสำรวจวิจัย (Research Method)</label>
-      <select id="f-method-select" onchange="onMethodSelectChange()" ${role==='advisor'?'disabled':''}>
+      <select id="f-method-select" onchange="onMethodSelectChange()">
         ${METHOD_OPTIONS.map(o=>`<option value="${escapeAttr(o)}" ${p.method===o?'selected':''}>${o}</option>`).join('')}
         <option value="__other__" ${!METHOD_OPTIONS.includes(p.method)?'selected':''}>อื่นๆ (ระบุเอง)</option>
       </select>
-      <input id="f-method-custom" style="margin-top:8px; display:${!METHOD_OPTIONS.includes(p.method)?'block':'none'};" placeholder="ระบุลักษณะการทำวิจัยเอง เช่น Survey ผสม interview กลุ่มตัวอย่าง n=..." value="${escapeAttr(!METHOD_OPTIONS.includes(p.method)?p.method:'')}" ${role==='advisor'?'disabled':''}>
+      <input id="f-method-custom" style="margin-top:8px; display:${!METHOD_OPTIONS.includes(p.method)?'block':'none'};" placeholder="ระบุลักษณะการทำวิจัยเอง เช่น Survey ผสม interview กลุ่มตัวอย่าง n=..." value="${escapeAttr(!METHOD_OPTIONS.includes(p.method)?p.method:'')}">
     </div>
     <div class="mfield"><label>กลุ่มวิศวกร</label>
-      <select id="f-level" ${role==='advisor'?'disabled':''}>
+      <select id="f-level">
         <option value="entry" ${p.level==='entry'?'selected':''}>Entry-level</option>
         <option value="experienced" ${p.level==='experienced'?'selected':''}>Experienced</option>
         <option value="both" ${p.level==='both'?'selected':''}>ทั้งสองกลุ่ม</option>
@@ -1680,11 +1391,11 @@ function openModal(id){
     </div>
     <div class="mfield"><label>Competency (เลือกได้มากกว่า 1)</label>
       <div class="tagcheck-grid" id="tagCheckGrid">
-        ${ALL_TAGS.map(t=>`<label class="tagcheck-item"><input type="checkbox" value="${t}" ${p.tags.includes(t)?'checked':''} ${role==='advisor'?'disabled':''}><span>${t}</span></label>`).join('')}
+        ${ALL_TAGS.map(t=>`<label class="tagcheck-item"><input type="checkbox" value="${t}" ${p.tags.includes(t)?'checked':''}><span>${t}</span></label>`).join('')}
       </div>
     </div>
     <div class="mfield"><label>บันทึกของนักศึกษา (แก้ไขได้)</label>
-      <textarea id="f-notes" ${role==='advisor'?'disabled':''}>${p.notes}</textarea>
+      <textarea id="f-notes">${p.notes}</textarea>
     </div>
     <div class="mfield"><label>สถานะการตรวจ</label>
       <div class="statusrow" id="statusRow">
@@ -1692,14 +1403,14 @@ function openModal(id){
       </div>
     </div>
     <div class="mfield"><label>Feedback จากอาจารย์ที่ปรึกษา</label>
-      <textarea id="f-feedback" placeholder="เขียน feedback ถ้าติ๊ก 'ไม่ผ่าน' หรือมีข้อเสนอแนะ..." ${role==='student'?'disabled':''}>${p.feedback}</textarea>
+      <textarea id="f-feedback" placeholder="เขียน feedback ถ้าติ๊ก 'ไม่ผ่าน' หรือมีข้อเสนอแนะ...">${p.feedback}</textarea>
     </div>
     <div class="mfield">
       <label>การสนทนา (นักศึกษา ↔ อาจารย์ที่ปรึกษา)</label>
       <div class="commentbox">
         <div class="clist" id="clist"></div>
         <div class="caddrow">
-          <textarea id="newComment" placeholder="${(role==='advisor'||role==='admin')?'เขียนความเห็นถึงนักศึกษา...':'เขียนคำถามหรืออัปเดตถึงอาจารย์...'}" ${isAddingNew?'disabled':''}></textarea>
+          <textarea id="newComment" placeholder="เขียนความเห็น / คำถาม / อัปเดต..." ${isAddingNew?'disabled':''}></textarea>
           <button class="btn" style="padding:9px 14px;" onclick="addComment()" ${isAddingNew?'disabled':''}>ส่ง</button>
         </div>
         ${isAddingNew ? `<div class="dupwarn" style="color:var(--ink-soft);">บันทึกงานวิจัยนี้ก่อน จึงจะเริ่มสนทนาได้</div>` : ''}
@@ -1745,17 +1456,17 @@ async function saveModal(){
   const statusRow = document.getElementById('statusRow');
   const picked = statusRow.dataset.picked;
   const originalStatus = statusRow.dataset.original;
-  const titleEl = document.getElementById('f-title'); if(titleEl && !titleEl.disabled) p.title = titleEl.value.trim() || p.title;
-  const authorsEl = document.getElementById('f-authors'); if(authorsEl && !authorsEl.disabled) p.authors = authorsEl.value.trim();
-  const yearEl = document.getElementById('f-year'); if(yearEl && !yearEl.disabled) p.year = yearEl.value.trim();
-  const venueEl = document.getElementById('f-venue'); if(venueEl && !venueEl.disabled) p.venue = venueEl.value.trim();
+  const titleEl = document.getElementById('f-title'); if(titleEl) p.title = titleEl.value.trim() || p.title;
+  const authorsEl = document.getElementById('f-authors'); if(authorsEl) p.authors = authorsEl.value.trim();
+  const yearEl = document.getElementById('f-year'); if(yearEl) p.year = yearEl.value.trim();
+  const venueEl = document.getElementById('f-venue'); if(venueEl) p.venue = venueEl.value.trim();
   if(picked) p.status = picked;
-  const urlEl = document.getElementById('f-url'); if(urlEl && !urlEl.disabled) p.url = urlEl.value.trim();
-  const summary = document.getElementById('f-summary'); if(summary && !summary.disabled) p.mySummaryUrl = summary.value.trim();
-  const country = document.getElementById('f-country'); if(country && !country.disabled) p.country = country.value;
+  const urlEl = document.getElementById('f-url'); if(urlEl) p.url = urlEl.value.trim();
+  const summary = document.getElementById('f-summary'); if(summary) p.mySummaryUrl = summary.value.trim();
+  const country = document.getElementById('f-country'); if(country) p.country = country.value;
   const methodSel = document.getElementById('f-method-select');
   const methodCustom = document.getElementById('f-method-custom');
-  if(methodSel && !methodSel.disabled){
+  if(methodSel){
     if(methodSel.value === '__other__'){
       const customVal = (methodCustom ? methodCustom.value.trim() : '');
       if(customVal) p.method = customVal;
@@ -1763,18 +1474,18 @@ async function saveModal(){
       p.method = methodSel.value;
     }
   }
-  const level = document.getElementById('f-level'); if(level && !level.disabled) p.level = level.value;
+  const level = document.getElementById('f-level'); if(level) p.level = level.value;
   const tagGrid = document.getElementById('tagCheckGrid');
   if(tagGrid){
     const boxes = tagGrid.querySelectorAll('input[type=checkbox]');
-    if(boxes.length && !boxes[0].disabled){
+    if(boxes.length){
       p.tags = Array.from(boxes).filter(b=>b.checked).map(b=>b.value);
     }
   }
-  const notes = document.getElementById('f-notes'); if(notes && !notes.disabled) p.notes = notes.value;
+  const notes = document.getElementById('f-notes'); if(notes) p.notes = notes.value;
   const feedbackEl = document.getElementById('f-feedback');
-  const feedbackChanged = feedbackEl && !feedbackEl.disabled && feedbackEl.value !== p.feedback;
-  if(feedbackEl && !feedbackEl.disabled) p.feedback = feedbackEl.value;
+  const feedbackChanged = feedbackEl && feedbackEl.value !== p.feedback;
+  if(feedbackEl) p.feedback = feedbackEl.value;
 
   if(isNew){
     papers.push(p);
@@ -1786,13 +1497,13 @@ async function saveModal(){
   renderPapers(); renderStats(); renderGoals(); renderAnalytics();
 
   if(isNew){
-    sendNotification('มีการเพิ่มงานวิจัยใหม่', `"${p.title}" ถูกเพิ่มโดย${roleLabel(role)}`);
+    sendNotification('มีการเพิ่มงานวิจัยใหม่', `"${p.title}" ถูกเพิ่ม`);
   }else{
     if(picked && picked !== originalStatus){
-      sendNotification(`มีการตรวจงานวิจัย: ${p.title}`, `สถานะเปลี่ยนเป็น "${statusLabel(picked)}" โดย${roleLabel(role)}`);
+      sendNotification(`มีการตรวจงานวิจัย: ${p.title}`, `สถานะเปลี่ยนเป็น "${statusLabel(picked)}"`);
     }
-    if((role==='advisor'||role==='admin') && feedbackChanged && p.feedback.trim()){
-      sendNotification(`Feedback ใหม่จากอาจารย์: ${p.title}`, p.feedback);
+    if(feedbackChanged && p.feedback.trim()){
+      sendNotification(`Feedback ใหม่: ${p.title}`, p.feedback);
     }
   }
 
@@ -1821,7 +1532,7 @@ function renderComments(p){
   }
   list.innerHTML = items.map(c=>`
     <div class="citem">
-      <div class="chead"><span class="role-${c.role}">${roleLabel(c.role)}</span><span class="ctime">${c.time}</span></div>
+      <div class="chead"><span class="ctime">${c.time}</span></div>
       <div class="ctext">${escapeHtml(c.text)}</div>
     </div>
   `).join('');
@@ -1835,14 +1546,12 @@ async function addComment(){
   const text = ta.value.trim();
   if(!text) return;
   if(!p.comments) p.comments = [];
-  p.comments.push({role, text, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})});
+  p.comments.push({text, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})});
   ta.value = '';
   await savePapers();
   renderComments(p);
   renderPapers();
-  if(role==='advisor'||role==='admin'){
-    sendNotification(`คอมเมนต์ใหม่จากอาจารย์: ${p.title}`, text);
-  }
+  sendNotification(`คอมเมนต์ใหม่: ${p.title}`, text);
 }
 
 /* ================= ANALYTICS ================= */
@@ -2193,7 +1902,7 @@ function updateGlobeData(){
 }
 
 /* ================= INIT ================= */
-initAuth();
+loadAll();
 </script>
 </body>
 </html>
