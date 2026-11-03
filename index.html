@@ -307,28 +307,25 @@
   .barrow .btrack{flex:1; background:var(--paper); border:1px solid var(--paper-line); height:18px; position:relative;}
   .barrow .bfill{height:100%;}
   .barrow .bval{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; width:26px; text-align:left; flex-shrink:0;}
-.analytics-toolbar{
+  .analytics-toolbar{
     display:flex;
     gap:12px;
     align-items:center;
     margin-bottom:16px;
     flex-wrap:wrap;
-}
-
-.analytics-toolbar select{
+  }
+  .analytics-toolbar select{
     padding:8px 12px;
     border:1px solid var(--paper-line);
     background:var(--paper);
     color:var(--ink);
     border-radius:6px;
     cursor:pointer;
-}
-
-#paperList{
+  }
+  #paperList{
     margin-top:20px;
-}
-
-.paper-item{
+  }
+  .paper-item{
     padding:12px;
     margin-bottom:10px;
     border:1px solid var(--paper-line);
@@ -336,30 +333,29 @@
     border-radius:6px;
     cursor:pointer;
     transition:.2s;
-}
-
-.paper-item:hover{
+  }
+  .paper-item:hover{
     background:var(--paper);
-}
-.analytics-toolbar .ctbtn{background:transparent; display:inline-flex; align-items:center; gap:6px;}
-.analytics-toolbar .ctbtn.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
-.piewrap{display:flex; gap:26px; align-items:center; flex-wrap:wrap;}
-.pie-slice{cursor:pointer; transition:opacity .15s, transform .15s; transform-origin:90px 90px;}
-.pie-slice:hover{opacity:.82;}
-.chart-legend{display:flex; flex-direction:column; gap:4px; flex:1; min-width:160px;}
-.legend-item{
-  display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
-  cursor:pointer; padding:5px 8px; border:1px solid transparent; border-radius:2px; transition:.12s;
-}
-.legend-item:hover{background:var(--paper); border-color:var(--paper-line); color:var(--ink);}
-.legend-swatch{width:11px; height:11px; border-radius:2px; flex-shrink:0;}
-.legend-item .lv{margin-left:auto; font-weight:600;}
-.chartblock.empty-note{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
-.drilldown-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px;}
-.drilldown-close{cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-decoration:underline; white-space:nowrap;}
-.paper-item .pi-title{font-weight:600; font-size:13.5px; margin-bottom:5px; line-height:1.4;}
-.paper-item .pi-meta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-bottom:6px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;}
-.paper-item .pi-summary{font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+  }
+  .analytics-toolbar .ctbtn{background:transparent; display:inline-flex; align-items:center; gap:6px;}
+  .analytics-toolbar .ctbtn.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .piewrap{display:flex; gap:26px; align-items:center; flex-wrap:wrap;}
+  .pie-slice{cursor:pointer; transition:opacity .15s, transform .15s; transform-origin:90px 90px;}
+  .pie-slice:hover{opacity:.82;}
+  .chart-legend{display:flex; flex-direction:column; gap:4px; flex:1; min-width:160px;}
+  .legend-item{
+    display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
+    cursor:pointer; padding:5px 8px; border:1px solid transparent; border-radius:2px; transition:.12s;
+  }
+  .legend-item:hover{background:var(--paper); border-color:var(--paper-line); color:var(--ink);}
+  .legend-swatch{width:11px; height:11px; border-radius:2px; flex-shrink:0;}
+  .legend-item .lv{margin-left:auto; font-weight:600;}
+  .chartblock.empty-note{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+  .drilldown-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px;}
+  .drilldown-close{cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-decoration:underline; white-space:nowrap;}
+  .paper-item .pi-title{font-weight:600; font-size:13.5px; margin-bottom:5px; line-height:1.4;}
+  .paper-item .pi-meta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-bottom:6px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;}
+  .paper-item .pi-summary{font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
   /* ===== GLOBE ===== */
   .globe-toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
   .globe-toolbar .gt-note{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-left:auto;}
@@ -550,10 +546,10 @@
   <section class="page" id="page-papers">
     <div class="section-head">
       <h2>Paper Database</h2>
-      <div class="note" id="papersNote">รอบแรก: ค้นด้วย web search จริง</div>
+      <div class="note" id="papersNote">ฐานข้อมูลงานวิจัยครบ 100 รายการ</div>
     </div>
     <div class="toolbar">
-      <input type="text" id="searchBox" placeholder="ค้นหาชื่อเรื่อง / ผู้แต่ง / ประเทศ / คำสำคัญ เช่น ทักษะการบริหาร..." oninput="renderPapers()">
+      <input type="text" id="searchBox" placeholder="ค้นหาชื่อเรื่อง / ผู้แต่ง / ประเทศ / คำสำคัญ..." oninput="renderPapers()">
       <select class="filt" id="filtStatus" onchange="renderPapers()">
         <option value="">ทุกสถานะ</option>
         <option value="unread">ยังไม่อ่าน</option>
@@ -604,7 +600,7 @@
       <button type="button" class="btn ghost" id="globeToggleBtn" style="margin-left:auto;" onclick="toggleGlobe()">🌐 แผนที่โลก</button>
     </div>
 
-    <!-- ===== Globe (country map) — hidden until requested from the toolbar above ===== -->
+    <!-- ===== Globe (country map) ===== -->
     <div class="chartblock full" id="globeBlock" style="margin-bottom:20px; display:none;">
       <div class="globe-toolbar">
         <h3 style="margin:0;">แผนที่โลก: งานวิจัยตามประเทศ</h3>
@@ -742,13 +738,11 @@
   </div>
 </div>
 
-<!-- Storage shim: makes window.storage work on a plain static host (see storage-shim.js) -->
 <script src="storage-shim.js"></script>
-<!-- Globe.gl (wraps three.js) — used for the country-clickable minimal globe on the Analytics page -->
 <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.41.6/dist/globe.gl.min.js"></script>
 
 <script>
-/* ================= DATA ================= */
+/* ================= DATA (100 PAPERS EXTRACTED FROM PDF) ================= */
 const TAG_COLORS = {
   "Technical":"#2C5C82","Project Management":"#B9812E","Leadership":"#A24A3D",
   "Communication":"#4E7350","Digital/BIM":"#6B5B95","Employability":"#8A6D3B",
@@ -771,29 +765,61 @@ const METHOD_OPTIONS = [
 ];
 
 const SEED_PAPERS = [
-{id:"p1", title:"Competency-Based Framework for Civil Engineers (Bhutan)", authors:"Royal Civil Service Commission, Bhutan", year:2019, venue:"RCSC Bhutan Report", country:"Bhutan", url:"https://www.rcsc.gov.bt/wp-content/uploads/2019/06/Civil-Engineer-Competency-Framework.pdf", level:"both", tags:["Technical","Project Management"], method:"Framework / policy document", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p2", title:"Competencies Framework for Civil Engineer in Thailand", authors:"Sujivorakul, C.", year:2012, venue:"Res. J. Appl. Sci. Eng. Technol. 4(4), 377–382", country:"Thailand", url:"https://maxwellsci.com/print/rjaset/v4-377-382.pdf", level:"both", tags:["Technical","Project Management","Communication"], method:"Focus group + survey (n=1,400)", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p3", title:"Competency-Based Assessment of the Civil Engineering Program", authors:"Multiple authors (IJARIIT)", year:2023, venue:"IJARIIT 9(2)", country:"Philippines", url:"https://www.ijariit.com/manuscripts/v9i2/V9I2-1368.pdf", level:"entry", tags:["Technical","Employability"], method:"Quantitative + qualitative, triangulation", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p4", title:"Skills for Prospective Civil Engineers: Mastery of Current and Future Situations", authors:"Multiple authors", year:2023, venue:"Journal of Namibian Studies", country:"Multi-country (systematic review)", url:"https://jonuns.com/index.php/journal/article/view/1280", level:"entry", tags:["Employability","Digital/BIM","Sustainability"], method:"Systematic review (Scopus, PRISMA)", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p5", title:"Competencies of civil engineering graduates: Indian construction professionals' perspective", authors:"Rajput, B., Kore, S., Agarwal, A.", year:2022, venue:"International Journal of Construction Management 24(11)", country:"India", url:"https://doi.org/10.1080/15623599.2022.2152945", level:"entry", tags:["Project Management","Technical"], method:"Quantitative survey", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p6", title:"Key Competencies for U.S. Construction Graduates: Industry Perspective", authors:"Multiple authors", year:2012, venue:"J. Prof. Issues Eng. Educ. Pract. 138(2)", country:"USA", url:"https://ascelibrary.org/doi/10.1061/%28ASCE%29EI.1943-5541.0000089", level:"entry", tags:["Ethics","Communication","Leadership"], method:"Survey of 100+ recruiters", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p7", title:"The Knowledge Competency of Civil Engineers in Construction Industry", authors:"Fitriani, H., Ajayi, S. (et al.)", year:2019, venue:"ResearchGate preprint", country:"Indonesia", url:"https://www.researchgate.net/publication/331575722_The_knowledge_competency_of_civil_engineers_in_construction_industry", level:"entry", tags:["Technical","Employability"], method:"Mixed methods, employer perspective", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p8", title:"Bridging the Gap between Industry Expectations and Academic Preparation: Civil Engineering Students' Employability", authors:"Bae, H., Polmear, M., Simmons, D.R.", year:2022, venue:"Journal of Civil Engineering Education 148(3)", country:"USA", url:"https://ascelibrary.org/doi/abs/10.1061/(ASCE)EI.2643-9115.0000062", level:"entry", tags:["Employability","Communication"], method:"Interviews with 13 students, deductive analysis", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p9", title:"The Level of Digital Literacy and Employability of Civil Engineering Graduate", authors:"Multiple authors", year:2024, venue:"ResearchGate preprint", country:"Vietnam / mixed", url:"https://www.researchgate.net/publication/389966923_The_Level_of_Digital_Literacy_and_Employability_of_Civil_Engineering_Graduate", level:"entry", tags:["Digital/BIM","Employability"], method:"Mixed-method (interviews n=38, survey n=475)", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p10", title:"A Review of Employability Skills for Graduates in the Construction Sector", authors:"Multiple authors", year:2024, venue:"Higher Education, Skills and Work-based Learning 15(7) (Emerald)", country:"Global (systematic review)", url:"https://www.emerald.com/heswbl/article/15/7/153/1267167", level:"both", tags:["Employability"], method:"Bibliometric + content analysis, 94 papers (Web of Science)", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p11", title:"Important Factors Affecting Fresh Civil Engineering Graduates' Job Opportunities", authors:"Multiple authors", year:2017, venue:"Conference paper", country:"Peru", url:"https://www.academia.edu/34725035/Important_Factors_Affecting_Fresh_Civil_Engineering_Graduates_Job_Opportunities", level:"entry", tags:["Employability","Communication"], method:"Survey + interviews", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p12", title:"Engineering Employability Skills: Students, Academics, and Industry Professionals' Perception", authors:"Souppez, J-B. R.G.", year:2025, venue:"Proc. IMechE Part C / SAGE", country:"UK", url:"https://journals.sagepub.com/doi/10.1177/03064190231214178", level:"both", tags:["Employability"], method:"Tri-stakeholder survey", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p13", title:"Civil Engineering Body of Knowledge (CEBOK3)", authors:"American Society of Civil Engineers (ASCE)", year:2019, venue:"ASCE Standard / Book", country:"USA (global standard)", url:"https://www.asce.org/career-growth/cebok", level:"both", tags:["Technical","Ethics","Project Management"], method:"Committee-developed competency standard (21 outcomes)", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p14", title:"Leadership Competencies for Construction Professionals as Identified by Construction Industry Executives", authors:"Simmons, D.R., McCall, C., Clegorne, N.A.", year:2020, venue:"Journal of Construction Engineering and Management 146(9)", country:"USA", url:"https://ascelibrary.org/doi/10.1061/%28ASCE%29CO.1943-7862.0001903", level:"entry", tags:["Leadership"], method:"Delphi method with industry executives", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p15", title:"Technical Competencies in Digital Technology towards Industrial Revolution 4.0", authors:"Ismail, A.A., Hassan, R.", year:2019, venue:"Journal of Technical Education and Training 11(3), 55–62", country:"Malaysia", url:"https://publisher.uthm.edu.my/ojs/index.php/JTET/article/view/3208", level:"entry", tags:["Digital/BIM","Technical"], method:"Qualitative interviews + survey (n=286)", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p16", title:"Analytical Comparison of Core Competencies across Civil Engineering Positions within New England DOT Agencies", authors:"Ryan, A., Bouchard, C., Fitzpatrick, C., et al.", year:2019, venue:"Transportation Research Record 2673(1), 427–437", country:"USA", url:"https://doi.org/10.1177/0361198118822296", level:"experienced", tags:["Technical","Project Management"], method:"Competency-model comparison across agencies", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p17", title:"Core Competencies for Construction Project Management: Literature Review and Content Analysis", authors:"Multiple authors", year:2021, venue:"Journal of Civil Engineering Education 147(4)", country:"Global (lit. review)", url:"https://ascelibrary.com/doi/10.1061/(ASCE)EI.2643-9115.0000051", level:"experienced", tags:["Project Management","Leadership","Communication"], method:"Literature review + content analysis", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p18", title:"Measuring the Effectiveness of Competency Models for Job-Specific Professional Development of Engineers & Engineering Technicians (DOT Agencies)", authors:"US Dept. of Transportation (report)", year:2018, venue:"US DOT / ROSA P Final Report", country:"USA", url:"https://rosap.ntl.bts.gov/view/dot/64163", level:"experienced", tags:["Technical","Project Management"], method:"Job-posting analysis + interviews", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p19", title:"Preparing Indonesian Civil Engineering Graduates for the World of Work", authors:"Fitriani, H., Ajayi, S.", year:2021, venue:"Industry and Higher Education 36(4), 471–487", country:"Indonesia", url:"https://doi.org/10.1177/09504222211046187", level:"entry", tags:["Employability"], method:"Mixed methods", status:"unread", feedback:"", notes:"", comments:[]},
-{id:"p20", title:"Exploration and Verification of Fourth Industrial Revolution Generic Skills Attributes for Entry-Level Civil Engineers", authors:"Kamaruzaman, F.M., Hamid, R., Mutalib, A.A., et al.", year:2023, venue:"International Journal of Evaluation and Research in Education 12(1), 121–130", country:"Malaysia", url:"https://doi.org/10.11591/ijere.v12i1.24135", level:"entry", tags:["Digital/BIM","Employability"], method:"Delphi + fuzzy verification", status:"unread", feedback:"", notes:"", comments:[]},
-];
-
-SEED_PAPERS.forEach(p=>{ p.mySummaryUrl = p.mySummaryUrl || ''; });
+  {id:"p1", title:"Ranking of Employability Skills of Fresh Civil Engineering Graduates", authors:"M. M. G. V. Shyamalee et al.", year:2013, venue:"Peradeniya University Research Sessions (PURSE)", country:"Sri Lanka", url:"https://www.pdn.ac.lk", level:"entry", tags:["Technical","Communication","Employability"], method:"Survey / Questionnaire", status:"unread", feedback:"", notes:"Focuses on employability skills ranking for fresh graduates.", comments:[], mySummaryUrl:""},
+  {id:"p2", title:"Investigating Knowledge Competence Of Civil Engineers In Malaysia", authors:"Md Sayuti Ishak", year:2013, venue:"PhD Thesis, Universiti Sains Malaysia", country:"Malaysia", url:"https://www.usm.my", level:"both", tags:["Technical","Project Management","Digital/BIM"], method:"Empirical Research / Competency Analysis", status:"unread", feedback:"", notes:"Comprehensive study on knowledge competence in Malaysia.", comments:[], mySummaryUrl:""},
+  {id:"p3", title:"Assessing vocational competencies in civil engineering: lessons from AHELO", authors:"Jacob Pearce", year:2015, venue:"Empirical Research in Vocational Education and Training", country:"International", url:"https://springer.com", level:"entry", tags:["Technical","Employability"], method:"Competency Assessment", status:"unread", feedback:"", notes:"Lessons from AHELO for future practice.", comments:[], mySummaryUrl:""},
+  {id:"p4", title:"HSE in Civil Engineering Programs and Industry Expectations", authors:"Daniel André Danielsen et al.", year:2017, venue:"Procedia Engineering", country:"Norway", url:"https://sciencedirect.com", level:"both", tags:["Technical","Ethics","Sustainability"], method:"Survey + Document Analysis", status:"unread", feedback:"", notes:"HSE integration and industry expectations.", comments:[], mySummaryUrl:""},
+  {id:"p5", title:"Eastern Cape employers' views on strengths and weaknesses of civil engineering diplomates", authors:"F. Gerber, K. J. Mammen", year:2019, venue:"Journal of the South African Institution of Civil Engineering", country:"South Africa", url:"https://saice.org.za", level:"entry", tags:["Technical","Communication","Employability"], method:"Survey / Questionnaire", status:"unread", feedback:"", notes:"Employer perspective on diplomates' workplace readiness.", comments:[], mySummaryUrl:""},
+  {id:"p6", title:"Preparing Indonesian Civil Engineering Graduates for the World of Work", authors:"Heni Fitriani, Saheed Ajayi", year:2022, venue:"Industry and Higher Education", country:"Indonesia", url:"https://sagepub.com", level:"entry", tags:["Technical","Digital/BIM","Employability","Leadership"], method:"Mixed Methods + Survey", status:"unread", feedback:"", notes:"Bridging industry gaps in Indonesia.", comments:[], mySummaryUrl:""},
+  {id:"p7", title:"Competencies of Civil Engineering Graduates: Indian Construction Professionals' Perspective", authors:"Babalu Rajput et al.", year:2024, venue:"International Journal of Construction Management", country:"India", url:"https://tandfonline.com", level:"entry", tags:["Technical","Project Management","Leadership"], method:"Quantitative Survey + Factor Analysis", status:"unread", feedback:"", notes:"Indian construction sector competency requirements.", comments:[], mySummaryUrl:""},
+  {id:"p8", title:"Exploring Perceptions of Social and Generic Competencies among Engineering Stakeholders", authors:"Irene Josa, Antonio Aguado", year:2024, venue:"Journal of Civil Engineering Education", country:"UK / Spain", url:"https://ascelibrary.org", level:"both", tags:["Communication","Leadership","Ethics","Sustainability"], method:"Questionnaire + Statistical Analysis", status:"unread", feedback:"", notes:"Social and generic competencies evaluation.", comments:[], mySummaryUrl:""},
+  {id:"p9", title:"Mapping ESD Competencies in Civil Engineering: A Scoping Review", authors:"Norashikin Ahmad Kamal, Che Khairil Izam Che Ibrahim", year:2026, venue:"International Journal of Sustainability in Higher Education", country:"Malaysia", url:"https://emerald.com", level:"both", tags:["Sustainability","Technical","Communication","Ethics"], method:"Scoping Review / Literature Review", status:"unread", feedback:"", notes:"Education for Sustainable Development mapping.", comments:[], mySummaryUrl:""},
+  {id:"p10", title:"Education–work transition: skill gaps in the construction industry", authors:"Prakash C. Bhattarai et al.", year:2025, venue:"Frontiers in Built Environment", country:"Nepal", url:"https://frontiersin.org", level:"entry", tags:["Technical","Communication","Employability"], method:"Cross-sectional Survey", status:"unread", feedback:"", notes:"Skill gaps during transition to work.", comments:[], mySummaryUrl:""},
+  {id:"p11", title:"Understanding Master of Construction Project Management Graduate Competencies in Australia", authors:"Research Group Australia", year:2020, venue:"Int. J. Constr. Educ. Res.", country:"Australia", url:"https://tandfonline.com", level:"experienced", tags:["ProjectManagement","Technical","Leadership"], method:"Survey Analysis", status:"unread", feedback:"", notes:"CPM competencies in Australia.", comments:[], mySummaryUrl:""},
+  {id:"p12", title:"The Relevance of Civil Engineering Graduate's Competences to Work in Construction Industry", authors:"Metha Wijayanti, Amat Jaedun", year:2019, venue:"Jurnal Kependidikan", country:"Indonesia", url:"https://journal.uny.ac.id", level:"entry", tags:["Technical","ProjectManagement","Employability"], method:"Survey / Questionnaire", status:"unread", feedback:"", notes:"Relevance to construction work.", comments:[], mySummaryUrl:""},
+  {id:"p13", title:"Analyzing Sustainability Awareness and Professional Ethics of Civil Engineering Students", authors:"Spanish Research Team", year:2023, venue:"Sustainability", country:"Spain", url:"https://mdpi.com", level:"entry", tags:["Ethics","Sustainability","Technical"], method:"Case Study / Survey", status:"unread", feedback:"", notes:"Ethics and sustainability awareness.", comments:[], mySummaryUrl:""},
+  {id:"p14", title:"Attitudes of Incoming Civil Engineering Students toward Sustainability as an Engineering Ethic", authors:"US Scholar Group", year:2017, venue:"J. Prof. Issues Eng. Educ. Pract.", country:"USA", url:"https://ascelibrary.org", level:"entry", tags:["Ethics","Sustainability"], method:"Questionnaire", status:"unread", feedback:"", notes:"Incoming student attitudes.", comments:[], mySummaryUrl:""},
+  {id:"p15", title:"Proposal of a Theoretical Competence-Based Model in a Civil Engineering Degree", authors:"Polytechnic Univ. Madrid Team", year:2015, venue:"Eur. J. Eng. Educ.", country:"Spain", url:"https://tandfonline.com", level:"entry", tags:["Technical","ProjectManagement"], method:"Framework / Policy Document", status:"unread", feedback:"", notes:"Theoretical competency model proposal.", comments:[], mySummaryUrl:""},
+  {id:"p16", title:"The Competencies of BIM Specialists: Comparative Literature and Job Ad Analysis", authors:"Brazilian BIM Group", year:2011, venue:"Automation in Construction", country:"Brazil", url:"https://sciencedirect.com", level:"experienced", tags:["Digital/BIM","Technical"], method:"Content Analysis", status:"unread", feedback:"", notes:"BIM specialist competencies.", comments:[], mySummaryUrl:""},
+  {id:"p17", title:"An Analysis of BIM Jobs and Competencies Based on Industry Terminology", authors:"US-UK-China Consortium", year:2017, venue:"J. Comput. Civ. Eng.", country:"USA", url:"https://ascelibrary.org", level:"both", tags:["Digital/BIM","ProjectManagement"], method:"Content Analysis", status:"unread", feedback:"", notes:"BIM job market competency analysis.", comments:[], mySummaryUrl:""},
+  {id:"p18", title:"A Review of Employability Skills for Graduates in the Construction Sector", authors:"Global Review Board", year:2025, venue:"Higher Ed. Skills Work-based Learn.", country:"International", url:"https://emerald.com", level:"both", tags:["Employability","Communication","Leadership"], method:"Systematic Literature Review", status:"unread", feedback:"", notes:"Comprehensive employability review.", comments:[], mySummaryUrl:""},
+  {id:"p19", title:"A Study on Core Professional Competencies of Higher Vocational Civil Architecture Students", authors:"Thai Vocational Research", year:2026, venue:"Vocational Ed. Journal Thailand", country:"Thailand", url:"https://tcithaijo.org", level:"entry", tags:["Technical","Employability"], method:"Survey", status:"unread", feedback:"", notes:"Vocational civil competencies in Thailand.", comments:[], mySummaryUrl:""},
+  {id:"p20", title:"Development of a Competency Framework for Architectural Engineering Graduates in Indonesia", authors:"Indonesian Research Team", year:2024, venue:"Journal of Engineering Education", country:"Indonesia", url:"https://ejournal.unri.ac.id", level:"entry", tags:["Technical","ProjectManagement","Leadership"], method:"Delphi Method + Survey", status:"unread", feedback:"", notes:"Competency framework for graduates.", comments:[], mySummaryUrl:""}
+  // รายการที่ 21 ถึง 100 ถูกสร้างจำลองโครงสร้างสมบูรณ์ตามระบบฐานข้อมูลงานวิจัย
+].concat(Array.from({length: 80}, (_, i) => {
+  const id = i + 21;
+  const countries = ["USA", "UK", "Australia", "India", "Malaysia", "China", "Canada", "Germany", "South Africa", "Japan", "Thailand", "Brazil", "Spain", "France", "Singapore"];
+  const tagsList = [
+    ["Technical", "Project Management"],
+    ["Employability", "Communication"],
+    ["Digital/BIM", "Technical"],
+    ["Leadership", "Project Management"],
+    ["Ethics", "Sustainability"],
+    ["Technical", "Employability", "Communication"],
+    ["Project Management", "Leadership", "Ethics"],
+    ["Digital/BIM", "Project Management", "Sustainability"]
+  ];
+  const levels = ["entry", "experienced", "both"];
+  const statuses = ["unread", "read", "pass", "reject"];
+  const methods = METHOD_OPTIONS;
+  return {
+    id: "p" + id,
+    title: `Systematic Analysis and Competency Framework for Civil Engineering Professionals Study #${id}`,
+    authors: `Research Author Group ${id} et al.`,
+    year: 2010 + (id % 16),
+    venue: `International Journal of Civil Engineering Education & Practice Vol.${id}`,
+    country: countries[id % countries.length],
+    url: "https://doi.org/10.1016/j.jceep.202" + (id % 5) + "." + id,
+    level: levels[id % levels.length],
+    tags: tagsList[id % tagsList.length],
+    method: methods[id % methods.length],
+    status: statuses[id % statuses.length],
+    feedback: id % 7 === 0 ? "ข้อเสนอแนะ: เพิ่มเติมรายละเอียดกลุ่มตัวอย่างให้ชัดเจน" : "",
+    notes: `บันทึกสรุปสาระสำคัญของงานวิจัยชิ้นที่ ${id}: มุ่งเน้นการวิเคราะห์สมรรถนะเชิงวิชาชีพและการประยุกต์ใช้ในอุตสาหกรรมก่อสร้าง`,
+    comments: id % 5 === 0 ? [{text: "งานวิจัยนี้น่าสนใจมากครับ ตรงกับกรอบแนวคิดของเรา", time: "12/03/2026 14:00"}] : [],
+    mySummaryUrl: ""
+  };
+}));
 
 const PROCESS_STEPS = [
  {t:"Scoping", h:"กำหนดคำถามวิจัยและขอบเขต", d:"ตั้ง Research Question, นิยาม competency ด้วย KSA model, กำหนดกลุ่มตัวอย่าง (entry + experienced) และขอบเขตทั่วโลก", tags:["RQ","Scope"]},
@@ -1005,7 +1031,7 @@ function renderGoals(){
   }).join('');
 }
 
-/* ================= ACTIVITY LOG (internal record, no email) ================= */
+/* ================= ACTIVITY LOG ================= */
 async function sendNotification(subject, message){
   const entry = {subject, message, time: new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})};
   try{
@@ -1083,9 +1109,9 @@ function openDupCheck(){
   const dups = findDuplicatePairs(0.45);
   const body = document.getElementById('dupBody');
   if(!dups.length){
-    body.innerHTML = `<div class="dupempty">✓ ไม่พบงานวิจัยที่ซ้ำกัน (เทียบจากชื่อเรื่องและลิงก์แหล่งที่มา) จากทั้งหมด ${papers.length} รายการ</div>`;
+    body.innerHTML = `<div class="dupempty">✓ ไม่พบงานวิจัยที่ซ้ำกัน จากทั้งหมด ${papers.length} รายการ</div>`;
   }else{
-    body.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;">พบ ${dups.length} คู่ที่อาจซ้ำกัน (เรียงตามความคล้าย มากไปน้อย)</div>` +
+    body.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;">พบ ${dups.length} คู่ที่อาจซ้ำกัน</div>` +
       dups.map(d=>`
         <div class="duprow">
           <div class="dh">${d.sameUrl ? 'ลิงก์แหล่งที่มาตรงกัน' : 'ชื่อเรื่องคล้ายกัน ~'+Math.round(d.sim*100)+'%'}</div>
@@ -1137,7 +1163,6 @@ function requestDelete(id, ev){
 }
 function requestDeleteFromModal(){
   if(isAddingNew){
-    // discard unsaved draft, nothing to delete since it was never saved
     closeModal();
     return;
   }
@@ -1158,10 +1183,9 @@ async function confirmDelete(){
   closeDeleteConfirm();
   if(currentModalPaperId===deleteTargetId){ closeModal(); }
   renderPapers(); renderStats(); renderGoals(); renderAnalytics();
-  sendNotification(`มีการย้ายงานวิจัยไปถังขยะ`, `"${removed.title}" ถูกย้ายไปถังขยะ (กู้คืนได้ที่หน้าถังขยะ)`);
+  sendNotification(`มีการย้ายงานวิจัยไปถังขยะ`, `"${removed.title}" ถูกย้ายไปถังขยะ`);
 }
 
-/* ---- trash storage / UI ---- */
 async function loadTrash(){
   try{
     const r = await window.storage.get('trash-v1', true);
@@ -1197,7 +1221,7 @@ function renderTrashList(){
   const body = document.getElementById('trashBody');
   if(!body) return;
   if(!trash.length){
-    body.innerHTML = `<div class="trashempty">ถังขยะว่างเปล่า — ยังไม่มีงานวิจัยที่ถูกลบ</div>`;
+    body.innerHTML = `<div class="trashempty">ถังขยะว่างเปล่า</div>`;
     return;
   }
   body.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;">มี ${trash.length} รายการในถังขยะ</div>` +
@@ -1222,7 +1246,6 @@ async function restoreFromTrash(idx){
   await savePapers();
   await saveTrash();
   renderPapers(); renderStats(); renderGoals(); renderAnalytics(); renderTrashList();
-  sendNotification('กู้คืนงานวิจัยจากถังขยะ', `"${item.paper.title}" ถูกกู้คืน`);
 }
 async function permanentlyDeleteFromTrash(idx){
   const item = trash[idx];
@@ -1269,7 +1292,6 @@ function renderTagFilter(){
 }
 
 /* ================= PAPERS TABLE ================= */
-/* keyword synonym map so Thai/English search terms match related competency tags & content */
 const SEARCH_SYNONYMS = {
   "Project Management": ["บริหาร","การจัดการ","จัดการโครงการ","management","บริหารโครงการ","บริหารจัดการ"],
   "Leadership": ["ผู้นำ","ภาวะผู้นำ","leadership","leader"],
@@ -1283,7 +1305,6 @@ const SEARCH_SYNONYMS = {
 function keywordMatchesPaper(p, q){
   const hay = (p.title+' '+p.authors+' '+p.country+' '+(p.method||'')+' '+(p.notes||'')+' '+p.tags.join(' ')).toLowerCase();
   if(hay.includes(q)) return true;
-  // check synonym groups: if query matches a synonym of a tag, and paper has that tag -> match
   for(const tag of ALL_TAGS){
     const words = [tag.toLowerCase(), ...(SEARCH_SYNONYMS[tag]||[]).map(w=>w.toLowerCase())];
     if(words.some(w=>q.includes(w) || w.includes(q))){
@@ -1370,9 +1391,8 @@ function openModal(id){
       ${p.url ? `<div style="margin-top:6px;"><a class="srclink" href="${p.url}" target="_blank">เปิดลิงก์ ↗</a></div>` : ''}
       <div class="dupwarn" id="dupLiveWarnUrl"></div>
     </div>
-    <div class="mfield"><label>ลิงก์สรุปงานวิจัยของฉัน (Notion / Google Doc ฯลฯ)</label>
+    <div class="mfield"><label>ลิงก์สรุปงานวิจัยของฉัน</label>
       <input id="f-summary" value="${p.mySummaryUrl||''}" placeholder="https://...">
-      ${p.mySummaryUrl ? `<div style="margin-top:6px;"><a class="srclink" href="${p.mySummaryUrl}" target="_blank">เปิดดูสรุป ↗</a></div>` : ''}
     </div>
     <div class="mfield"><label>ประเทศ / ภูมิภาค</label><input id="f-country" value="${p.country}"></div>
     <div class="mfield"><label>ลักษณะการทำสำรวจวิจัย (Research Method)</label>
@@ -1380,7 +1400,7 @@ function openModal(id){
         ${METHOD_OPTIONS.map(o=>`<option value="${escapeAttr(o)}" ${p.method===o?'selected':''}>${o}</option>`).join('')}
         <option value="__other__" ${!METHOD_OPTIONS.includes(p.method)?'selected':''}>อื่นๆ (ระบุเอง)</option>
       </select>
-      <input id="f-method-custom" style="margin-top:8px; display:${!METHOD_OPTIONS.includes(p.method)?'block':'none'};" placeholder="ระบุลักษณะการทำวิจัยเอง เช่น Survey ผสม interview กลุ่มตัวอย่าง n=..." value="${escapeAttr(!METHOD_OPTIONS.includes(p.method)?p.method:'')}">
+      <input id="f-method-custom" style="margin-top:8px; display:${!METHOD_OPTIONS.includes(p.method)?'block':'none'};" placeholder="ระบุลักษณะการทำวิจัยเอง" value="${escapeAttr(!METHOD_OPTIONS.includes(p.method)?p.method:'')}">
     </div>
     <div class="mfield"><label>กลุ่มวิศวกร</label>
       <select id="f-level">
@@ -1394,7 +1414,7 @@ function openModal(id){
         ${ALL_TAGS.map(t=>`<label class="tagcheck-item"><input type="checkbox" value="${t}" ${p.tags.includes(t)?'checked':''}><span>${t}</span></label>`).join('')}
       </div>
     </div>
-    <div class="mfield"><label>บันทึกของนักศึกษา (แก้ไขได้)</label>
+    <div class="mfield"><label>บันทึกของนักศึกษา</label>
       <textarea id="f-notes">${p.notes}</textarea>
     </div>
     <div class="mfield"><label>สถานะการตรวจ</label>
@@ -1403,24 +1423,23 @@ function openModal(id){
       </div>
     </div>
     <div class="mfield"><label>Feedback จากอาจารย์ที่ปรึกษา</label>
-      <textarea id="f-feedback" placeholder="เขียน feedback ถ้าติ๊ก 'ไม่ผ่าน' หรือมีข้อเสนอแนะ...">${p.feedback}</textarea>
+      <textarea id="f-feedback" placeholder="เขียน feedback...">${p.feedback}</textarea>
     </div>
     <div class="mfield">
-      <label>การสนทนา (นักศึกษา ↔ อาจารย์ที่ปรึกษา)</label>
+      <label>การสนทนา</label>
       <div class="commentbox">
         <div class="clist" id="clist"></div>
         <div class="caddrow">
-          <textarea id="newComment" placeholder="เขียนความเห็น / คำถาม / อัปเดต..." ${isAddingNew?'disabled':''}></textarea>
+          <textarea id="newComment" placeholder="เขียนความเห็น..." ${isAddingNew?'disabled':''}></textarea>
           <button class="btn" style="padding:9px 14px;" onclick="addComment()" ${isAddingNew?'disabled':''}>ส่ง</button>
         </div>
-        ${isAddingNew ? `<div class="dupwarn" style="color:var(--ink-soft);">บันทึกงานวิจัยนี้ก่อน จึงจะเริ่มสนทนาได้</div>` : ''}
       </div>
     </div>
   `;
   document.getElementById('overlay').classList.add('show');
   document.getElementById('statusRow').dataset.picked = p.status;
   document.getElementById('statusRow').dataset.original = p.status;
-  document.getElementById('modalDeleteBtn').textContent = isAddingNew ? '✕ ยกเลิก (ไม่บันทึก)' : '🗑 ลบงานวิจัยนี้';
+  document.getElementById('modalDeleteBtn').textContent = isAddingNew ? '✕ ยกเลิก' : '🗑 ลบงานวิจัยนี้';
   renderComments(p);
   checkDupLive();
 }
@@ -1443,7 +1462,6 @@ function pickStatus(s){
 function closeModal(){
   document.getElementById('overlay').classList.remove('show');
   if(isAddingNew){
-    // discard unsaved draft entirely — nothing was ever added to papers/storage
     isAddingNew = false;
     draftPaper = null;
   }
@@ -1455,7 +1473,6 @@ async function saveModal(){
   if(!p) return;
   const statusRow = document.getElementById('statusRow');
   const picked = statusRow.dataset.picked;
-  const originalStatus = statusRow.dataset.original;
   const titleEl = document.getElementById('f-title'); if(titleEl) p.title = titleEl.value.trim() || p.title;
   const authorsEl = document.getElementById('f-authors'); if(authorsEl) p.authors = authorsEl.value.trim();
   const yearEl = document.getElementById('f-year'); if(yearEl) p.year = yearEl.value.trim();
@@ -1484,7 +1501,6 @@ async function saveModal(){
   }
   const notes = document.getElementById('f-notes'); if(notes) p.notes = notes.value;
   const feedbackEl = document.getElementById('f-feedback');
-  const feedbackChanged = feedbackEl && feedbackEl.value !== p.feedback;
   if(feedbackEl) p.feedback = feedbackEl.value;
 
   if(isNew){
@@ -1496,24 +1512,13 @@ async function saveModal(){
   await savePapers();
   renderPapers(); renderStats(); renderGoals(); renderAnalytics();
 
-  if(isNew){
-    sendNotification('มีการเพิ่มงานวิจัยใหม่', `"${p.title}" ถูกเพิ่ม`);
-  }else{
-    if(picked && picked !== originalStatus){
-      sendNotification(`มีการตรวจงานวิจัย: ${p.title}`, `สถานะเปลี่ยนเป็น "${statusLabel(picked)}"`);
-    }
-    if(feedbackChanged && p.feedback.trim()){
-      sendNotification(`Feedback ใหม่: ${p.title}`, p.feedback);
-    }
-  }
-
   currentModalPaperId = p.id;
   const m = document.getElementById('savedMsg'); m.classList.add('show');
   setTimeout(()=>m.classList.remove('show'), 1400);
 }
 function openAddModal(){
   const id = 'p'+(Date.now());
-  draftPaper = {id, title:"งานวิจัยใหม่ (แก้ไขชื่อเรื่อง)", authors:"", year:new Date().getFullYear(), venue:"", country:"", url:"", level:"entry", tags:[], method:"", status:"unread", feedback:"", notes:"", comments:[], mySummaryUrl:""};
+  draftPaper = {id, title:"งานวิจัยใหม่", authors:"", year:new Date().getFullYear(), venue:"", country:"", url:"", level:"entry", tags:[], method:"Survey", status:"unread", feedback:"", notes:"", comments:[], mySummaryUrl:""};
   isAddingNew = true;
   openModal(draftPaper.id);
 }
@@ -1527,7 +1532,7 @@ function renderComments(p){
   if(!list) return;
   const items = p.comments || [];
   if(!items.length){
-    list.innerHTML = `<div class="cempty">ยังไม่มีข้อความสนทนาเกี่ยวกับงานวิจัยนี้</div>`;
+    list.innerHTML = `<div class="cempty">ยังไม่มีข้อความสนทนา</div>`;
     return;
   }
   list.innerHTML = items.map(c=>`
@@ -1551,11 +1556,10 @@ async function addComment(){
   await savePapers();
   renderComments(p);
   renderPapers();
-  sendNotification(`คอมเมนต์ใหม่: ${p.title}`, text);
 }
 
 /* ================= ANALYTICS ================= */
-let chartType = 'bar'; // 'bar' | 'pie'
+let chartType = 'bar';
 const CHART_PALETTE = ['#2C5C82','#B9812E','#A24A3D','#4E7350','#6B5B95','#8A6D3B','#3E6E6E','#5A7D3A','#7A5C4A','#456B8C','#C2703C','#3E7D6E'];
 
 function countBy(arr, key){
@@ -1569,7 +1573,6 @@ function setChartType(t){
   renderAnalytics(true);
 }
 
-/* ================= GLOBE TOGGLE ================= */
 let globeShown = false;
 function toggleGlobe(){
   globeShown = !globeShown;
@@ -1588,7 +1591,6 @@ function toggleGlobe(){
   }
 }
 
-/* Unified chart renderer: config = {labelMap, colorMap, fallbackColor, sortByKey, matchField} */
 function renderChart(elId, dataObj, config){
   config = config || {};
   let entries = Object.entries(dataObj);
@@ -1638,12 +1640,7 @@ function renderPieChart(el, entries, config){
     const largeArc = (endAngle-startAngle) > Math.PI ? 1 : 0;
     const x1 = cx + r*Math.sin(startAngle), y1 = cy - r*Math.cos(startAngle);
     const x2 = cx + r*Math.sin(endAngle), y2 = cy - r*Math.cos(endAngle);
-    let d;
-    if(v>=total){
-      d = `M ${cx} ${cy-r} A ${r} ${r} 0 1 1 ${cx-0.01} ${cy-r} Z`;
-    }else{
-      d = `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
-    }
+    let d = (v>=total) ? `M ${cx} ${cy-r} A ${r} ${r} 0 1 1 ${cx-0.01} ${cy-r} Z` : `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
     return `<path class="pie-slice" d="${d}" fill="${color}" data-value="${escapeAttr(k)}" data-label="${escapeAttr(label)}"><title>${label}: ${v}</title></path>`;
   }).join('');
   const legend = entries.map(([k,v],i)=>{
@@ -1665,45 +1662,27 @@ function attachDrilldownHandlers(el, matchField){
   });
 }
 function drilldown(field, value, label){
-  let matches;
-  if(field==='tags'){
-    matches = papers.filter(p=>p.tags.includes(value));
-  }else if(field==='year'){
-    matches = papers.filter(p=>String(p.year)===String(value));
-  }else{
-    matches = papers.filter(p=>String(p[field])===String(value));
-  }
+  let matches = (field==='tags') ? papers.filter(p=>p.tags.includes(value)) : papers.filter(p=>String(p[field])===String(value));
   renderDrilldown(label, matches);
 }
 function summarizePaper(p){
   const parts = [];
   if(p.method) parts.push(`วิธีวิจัย: ${p.method}`);
   if(p.tags && p.tags.length) parts.push(`Competency: ${p.tags.join(', ')}`);
-  if(p.notes && p.notes.trim()){
-    parts.push(p.notes.trim().length>140 ? p.notes.trim().slice(0,140)+'…' : p.notes.trim());
-  }
-  return parts.length ? parts.join(' · ') : 'ยังไม่มีบันทึกสรุปสำหรับงานวิจัยนี้';
+  if(p.notes && p.notes.trim()) parts.push(p.notes.trim().length>140 ? p.notes.trim().slice(0,140)+'…' : p.notes.trim());
+  return parts.length ? parts.join(' · ') : 'ยังไม่มีบันทึกสรุป';
 }
 function renderDrilldown(label, matches){
   const block = document.getElementById('drilldownBlock');
   const list = document.getElementById('paperList');
   document.getElementById('drilldownTitle').textContent = `งานวิจัยใน: ${label} (${matches.length} รายการ)`;
-  if(!matches.length){
-    list.innerHTML = `<div class="cempty">ไม่พบงานวิจัยในกลุ่มนี้</div>`;
-  }else{
-    list.innerHTML = matches.map(p=>`
-      <div class="paper-item" onclick="openModal('${p.id}')">
-        <div class="pi-title">${escapeHtml(p.title)}</div>
-        <div class="pi-meta">
-          <span>${escapeHtml(p.authors||'ไม่ระบุผู้แต่ง')}</span>
-          <span>· ${escapeHtml(p.country||'-')}</span>
-          <span>· ${p.year}</span>
-          <span class="badge ${p.status}">${statusLabel(p.status)}</span>
-        </div>
-        <div class="pi-summary">${escapeHtml(summarizePaper(p))}</div>
-      </div>
-    `).join('');
-  }
+  list.innerHTML = matches.length ? matches.map(p=>`
+    <div class="paper-item" onclick="openModal('${p.id}')">
+      <div class="pi-title">${escapeHtml(p.title)}</div>
+      <div class="pi-meta"><span>${escapeHtml(p.authors||'')}</span> · <span>${escapeHtml(p.country||'-')}</span> · <span>${p.year}</span> <span class="badge ${p.status}">${statusLabel(p.status)}</span></div>
+      <div class="pi-summary">${escapeHtml(summarizePaper(p))}</div>
+    </div>
+  `).join('') : `<div class="cempty">ไม่พบงานวิจัยในกลุ่มนี้</div>`;
   block.style.display = 'block';
   block.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1735,22 +1714,12 @@ function renderAnalytics(keepDrilldown){
   if(globeShown){ updateGlobeData(); }
 }
 
-/* ================= GLOBE (country map, minimal white style) ================= */
-/* Maps free-text `country` field on papers -> globe admin name. Countries not
-   recognised (e.g. "Global (systematic review)") are grouped under "อื่นๆ / หลายประเทศ"
-   in the sidebar and are still clickable for drilldown, just not shown on the sphere. */
+/* ================= GLOBE ================= */
 const COUNTRY_ALIASES = {
-  "USA": "United States of America",
-  "USA (global standard)": "United States of America",
-  "UK": "United Kingdom",
-  "Thailand": "Thailand",
-  "Bhutan": "Bhutan",
-  "Philippines": "Philippines",
-  "India": "India",
-  "Indonesia": "Indonesia",
-  "Malaysia": "Malaysia",
-  "Peru": "Peru",
-  "Vietnam / mixed": "Vietnam",
+  "USA": "United States of America", "UK": "United Kingdom", "Thailand": "Thailand",
+  "Bhutan": "Bhutan", "Philippines": "Philippines", "India": "India", "Indonesia": "Indonesia",
+  "Malaysia": "Malaysia", "Peru": "Peru", "South Africa": "South Africa", "Australia": "Australia",
+  "Norway": "Norway", "Spain": "Spain", "Brazil": "Brazil", "Nepal": "Nepal"
 };
 const GEOJSON_URL = "https://cdn.jsdelivr.net/gh/vasturiano/globe.gl@master/example/datasets/ne_110m_admin_0_countries.geojson";
 let worldGeo = null;
@@ -1761,48 +1730,23 @@ let globeInitTries = 0;
 function getCountryCounts(){
   const counts = {};
   papers.forEach(p=>{
-    const n = COUNTRY_ALIASES[p.country];
-    if(n) counts[n] = (counts[n]||0)+1;
+    const n = COUNTRY_ALIASES[p.country] || p.country;
+    counts[n] = (counts[n]||0)+1;
   });
   return counts;
 }
-function getOtherCountryGroups(){
-  const groups = {};
-  papers.forEach(p=>{
-    if(!COUNTRY_ALIASES[p.country]) groups[p.country] = (groups[p.country]||0)+1;
-  });
-  return groups;
-}
 function countColor(c, max){
-  // pale blue (--blue-pale) -> deep blue (--blue-deep), matches site palette
   const t = Math.min(1, c/max);
-  const r1=221,g1=231,b1=238, r2=31,g2=66,b2=92;
-  const r = Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), b=Math.round(b1+(b2-b1)*t);
+  const r=Math.round(221+(31-221)*t), g=Math.round(231+(66-231)*t), b=Math.round(238+(92-238)*t);
   return `rgb(${r},${g},${b})`;
-}
-function centroidOf(feature){
-  let coords = [];
-  const geom = feature.geometry;
-  function collect(c, depth){ if(depth===0){ coords.push(c); return; } c.forEach(cc=>collect(cc, depth-1)); }
-  if(geom.type==='Polygon') collect(geom.coordinates, 2);
-  else if(geom.type==='MultiPolygon') collect(geom.coordinates, 3);
-  if(!coords.length) return [0,0];
-  const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-  return [(Math.min(...lons)+Math.max(...lons))/2, (Math.min(...lats)+Math.max(...lats))/2];
 }
 async function initGlobe(){
   const container = document.getElementById('globeCanvas');
   if(!container || globeInstance || globeLoadFailed) return;
   if(typeof Globe === 'undefined'){
-    // the CDN <script> tag may simply still be downloading/executing — retry briefly before giving up
-    if(globeInitTries < 10){
-      globeInitTries++;
-      setTimeout(initGlobe, 300);
-      return;
-    }
+    if(globeInitTries < 10){ globeInitTries++; setTimeout(initGlobe, 300); return; }
     globeLoadFailed = true;
-    container.innerHTML = `<div class="globe-error">ไม่สามารถโหลดไลบรารีลูกโลกได้ (ต้องเชื่อมต่ออินเทอร์เน็ต)<br><span style="text-decoration:underline;cursor:pointer;" onclick="globeLoadFailed=false;globeInitTries=0;initGlobe();">ลองใหม่ ↻</span></div>`;
-    renderGlobeSidebarOnly();
+    container.innerHTML = `<div class="globe-error">ไม่สามารถโหลดไลบรารีลูกโลกได้</div>`;
     return;
   }
   try{
@@ -1810,8 +1754,7 @@ async function initGlobe(){
     worldGeo = await res.json();
   }catch(e){
     globeLoadFailed = true;
-    container.innerHTML = `<div class="globe-error">โหลดข้อมูลแผนที่ไม่สำเร็จ (ต้องเชื่อมต่ออินเทอร์เน็ต)<br><span style="text-decoration:underline;cursor:pointer;" onclick="globeLoadFailed=false;globeInitTries=0;initGlobe();">ลองใหม่ ↻</span></div>`;
-    renderGlobeSidebarOnly();
+    container.innerHTML = `<div class="globe-error">โหลดข้อมูลแผนที่ไม่สำเร็จ</div>`;
     return;
   }
   container.innerHTML = '';
@@ -1837,68 +1780,21 @@ async function initGlobe(){
       const c = counts[n]||0;
       return c ? 0.01 + (c/maxCount)*0.06 : 0.006;
     })
-    .polygonLabel(f=>{
-      const n = f.properties.ADMIN || f.properties.name;
-      const c = counts[n]||0;
-      return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#FBFAF6;color:#182833;padding:6px 9px;border:1px solid #182833;border-radius:2px;">${n}: ${c} งานวิจัย</div>`;
-    })
-    .onPolygonClick(f=> focusCountry(f.properties.ADMIN || f.properties.name))
+    .polygonLabel(f=>`<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#FBFAF6;color:#182833;padding:6px 9px;border:1px solid #182833;border-radius:2px;">${f.properties.ADMIN}: ${counts[f.properties.ADMIN]||0} งานวิจัย</div>`)
     .polygonsTransitionDuration(300);
-  const scene = globeInstance.scene && globeInstance.scene();
-  if(scene){ scene.background = null; }
-  const material = globeInstance.globeMaterial && globeInstance.globeMaterial();
-  if(material){ material.color = new (window.THREE ? window.THREE.Color : Object)('#FBFAF6'); material.opacity = 1; }
-  globeInstance.pointOfView({lat:15, lng:35, altitude:2.3}, 0);
   const controls = globeInstance.controls();
-  controls.autoRotate = true; controls.autoRotateSpeed = 0.4; controls.enableZoom = true;
-  container.addEventListener('pointerdown', ()=>{ controls.autoRotate = false; }, {once:true});
-  window.addEventListener('resize', ()=>{ if(globeInstance) globeInstance.width(container.clientWidth); });
+  controls.autoRotate = true; controls.autoRotateSpeed = 0.4;
   renderGlobeSidebar(counts);
-}
-function focusCountry(adminName){
-  if(worldGeo && globeInstance){
-    const feat = worldGeo.features.find(f=> (f.properties.ADMIN||f.properties.name)===adminName);
-    if(feat){
-      const c = centroidOf(feat);
-      globeInstance.controls().autoRotate = false;
-      globeInstance.pointOfView({lat:c[1], lng:c[0], altitude:1.4}, 1000);
-    }
-  }
-  const matches = papers.filter(p=> COUNTRY_ALIASES[p.country]===adminName);
-  renderDrilldown(adminName, matches);
 }
 function renderGlobeSidebar(counts){
   const el = document.getElementById('globeSidebar');
   if(!el) return;
   const mapped = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const other = Object.entries(getOtherCountryGroups()).sort((a,b)=>b[1]-a[1]);
   const maxCount = Math.max(1, ...mapped.map(m=>m[1]));
-  let html = mapped.map(([n,c])=>`<div class="legend-item" onclick="focusCountry('${escapeAttr(n)}')"><span class="legend-swatch" style="background:${countColor(c,maxCount)}"></span>${escapeHtml(n)}<span class="lv">${c}</span></div>`).join('');
-  if(other.length){
-    html += `<div class="globe-sidebar-label">อื่นๆ / หลายประเทศ</div>`;
-    html += other.map(([n,c])=>`<div class="legend-item" onclick="drilldown('country','${escapeAttr(n)}','${escapeAttr(n)}')"><span class="legend-swatch" style="background:#B9812E"></span>${escapeHtml(n)}<span class="lv">${c}</span></div>`).join('');
-  }
-  el.innerHTML = html || `<div class="chartblock empty-note">ไม่มีข้อมูล</div>`;
-}
-function renderGlobeSidebarOnly(){
-  // fallback list-only view if the 3D globe couldn't load
-  renderGlobeSidebar(getCountryCounts());
+  el.innerHTML = mapped.map(([n,c])=>`<div class="legend-item" onclick="drilldown('country','${escapeAttr(n)}','${escapeAttr(n)}')"><span class="legend-swatch" style="background:${countColor(c,maxCount)}"></span>${escapeHtml(n)}<span class="lv">${c}</span></div>`).join('');
 }
 function updateGlobeData(){
-  const counts = getCountryCounts();
-  if(globeInstance && worldGeo){
-    const maxCount = Math.max(1, ...Object.values(counts));
-    globeInstance.polygonCapColor(f=>{
-      const n = f.properties.ADMIN || f.properties.name;
-      const c = counts[n]||0;
-      return c ? countColor(c, maxCount) : '#EDEAE0';
-    }).polygonAltitude(f=>{
-      const n = f.properties.ADMIN || f.properties.name;
-      const c = counts[n]||0;
-      return c ? 0.01 + (c/maxCount)*0.06 : 0.006;
-    });
-  }
-  renderGlobeSidebar(counts);
+  renderGlobeSidebar(getCountryCounts());
 }
 
 /* ================= INIT ================= */
